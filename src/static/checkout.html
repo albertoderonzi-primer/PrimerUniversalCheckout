@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/checkout-style.css" />
+    <link
+      rel="stylesheet"
+      href="https://sdk.primer.io/web/v2-latest/Checkout.css"
+    />
+    <script
+      src="https://sdk.primer.io/web/v2-latest/Primer.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>The LEGO STORE [WEB-HUC]</title>
+  </head>
+  <body>
+    <div class="title-bar">
+      <div class="title-bar-text">Headless Universal Checkout (Manual Flow)</div>
+    </div>
+    <br />
+    <div class="window">
+      <div class="title-bar">
+        <div class="title-bar-text">Lego Saturn V</div>
+      </div>
+      <div class="window-body">
+        <img src="/static/lego.jpg" alt="Saturn V Lego Rocket">
+        <div id="order-container">
+          <div id="shirt-purchase-form">
+            <p class="heading">Take it home for 100£</p>
+            <input
+              type="number"
+              name="quantity"
+              id="quantity"
+              placeholder=" Quantity"
+              min="1"
+              class="inputs"
+            />
+
+            <select name="size" id="size" class="inputs">
+              <option value="s">Small</option>
+              <option value="m" selected>Medium</option>
+              <option value="l">Large</option>
+              <option value="xl">Extra-Large</option>
+            </select>
+            <p class="heading">Billing Info</p>
+            <input
+              type="text"
+              placeholder="First Name"
+              class="inputs"
+              id="first-name"
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              class="inputs"
+              id="last-name"
+            />
+            <input
+              type="text"
+              placeholder="Address Line 1"
+              class="inputs"
+              id="address-line1"
+            />
+            <input
+              type="text"
+              placeholder="Address Line 2"
+              class="inputs"
+              id="address-line2"
+            />
+            <input type="text" placeholder="City" class="inputs" id="city" />
+            <input type="text" placeholder="State" class="inputs" id="state" />
+            <input
+              type="text"
+              placeholder="Postal Code"
+              class="inputs"
+              id="postal-code"
+            />
+            <input
+              type="text"
+              placeholder="Country"
+              class="inputs"
+              id="country"
+            />
+            <button class="btn inputs" id="autofill-button">Autofill</button>
+            <button class="btn inputs" id="submit-button">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="/static/client-headless-manual.js"></script>
+</html>

@@ -1,0 +1,118 @@
+.window-body {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+img {
+  width: 48%;
+  border-radius: 2px;
+}
+
+#order-container {
+  width: 48%;
+}
+
+#shirt-purchase-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 98%;
+  margin: 10px;
+  text-align: center;
+  padding: 10px;
+}
+
+.heading {
+  font-size: medium;
+  font-weight: bold;
+  background-color: white;
+  padding: 5px;
+  text-align: center;
+
+
+  border-radius: 2px;
+}
+
+#quanitity {
+  height: 25px;
+}
+
+.inputs {
+  margin: 4px;
+}
+
+#checkout-container {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 98%;
+}
+
+.card-input {
+  height: 30px;
+  margin: 2px;
+}
+
+@media screen and (max-width: 700px) {
+  .window-body {
+    display: block; /* Stops it from floating */
+    margin: auto; /* Ensures that it is centered */
+    margin-bottom: 25px; /* Space between the stacked elements */
+  }
+  #order-container {
+    width: 100%;
+  }
+  #checkout-container {
+    margin-top: 25px;
+    max-width: 100%;
+    width: 100%;
+  }
+  img {
+    width: 100%;
+  }
+}
+
+.apm-button {
+  margin: 5px;
+}
+
+#submit-button {
+  margin: 5px;
+}
+
+.loading-div {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.2s;
+}
+
+.loading-spinner {
+  border: 16px solid gray; /* Light grey */
+  border-top: 16px solid black; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  position: absolute;
+  top: 33%;
+  left: 50%;
+  margin-top: -60px;
+  margin-left: -60px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
