@@ -14,7 +14,7 @@ var payment_id = 0;
 
 const staticDir = path.join(__dirname, 'static');
 // for Headless select checkout-headless.html
-// for dropin select checkout.html
+// for dropin select checkout-original.html
 const checkoutPage = path.join(__dirname, 'static', 'checkout-headless.html');
 
 
@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
 });
 
 ///////////////////////////////////////////
-// ✨ All the magic is here
+// ✨ All the magic is here !
 //    Create a client session
 ///////////////////////////////////////////
 
