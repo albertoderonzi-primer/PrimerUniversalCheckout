@@ -13,7 +13,9 @@ const app = express();
 var payment_id = 0;
 
 const staticDir = path.join(__dirname, 'static');
-const checkoutPage = path.join(__dirname, 'static', 'checkout.html');
+// for Headless select checkout-headless.html
+// for dropin select checkout.html
+const checkoutPage = path.join(__dirname, 'static', 'checkout-headless.html');
 
 
 // setting up cors
