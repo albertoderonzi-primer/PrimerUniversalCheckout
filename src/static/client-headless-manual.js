@@ -185,10 +185,11 @@ async function onLoaded() {
     async function onTokenizeSuccess(paymentMethodTokenData, handler) {
       // Send the Payment Method Token to your server
       // to create a payment using Payments API
-      //const response = await createPayment(paymentMethodTokenData.token)
-      // const orderInfo = getOrderInfo()
       const metadata = getOrderInfo().metadata
       const customerId = getOrderInfo().customerId
+      const orderId = getOrderInfo().orderId
+      const currencyCode = getOrderInfo().currencyCode
+      const amount = getOrderInfo().order.lineItems[0].amount
 
       const response = await fetch('/create-payment', {
         method: 'post',
@@ -197,8 +198,11 @@ async function onLoaded() {
         },
         //body: JSON.stringify({ 'customerId': "cust-1229", 'paymentMethodToken': paymentMethodTokenData.token, "paymentMethod": { "vaultOnSuccess": true }, "metadata": { "type": "add-card", "processor": "primer" } })
         body: JSON.stringify({
+          currencyCode,
+          amount,
           metadata,
           customerId,
+          orderId,
           'paymentMethodToken': paymentMethodTokenData.token,
         }),
 
