@@ -60,7 +60,7 @@ async function onLoaded() {
             name: `${quantity.value} Lego${quantity.value > 1 ? "s" : ""
               } - ${size.value.toUpperCase()}`,
             description: `${quantity.value} ${size.value.toUpperCase()} Lego`,
-            amount: 1000 * quantity.value,
+            amount: 10000 * quantity.value,
             productType: "PHYSICAL",
           },
         ],
@@ -274,18 +274,18 @@ async function onLoaded() {
             const cardExpiryInputId = 'checkout-card-expiry-input'
             const cardExpiryInputEl = document.createElement('div')
             cardExpiryInputEl.setAttribute('id', cardExpiryInputId)
-            cardExpiryInputEl.setAttribute("class", "card");
+            cardExpiryInputEl.setAttribute("class", "card-input");
 
             const cardCvvInputId = 'checkout-card-cvv-input'
             const cardCvvInputEl = document.createElement('div')
             cardCvvInputEl.setAttribute('id', cardCvvInputId)
-            cardCvvInputEl.setAttribute("class", "card");
+            cardCvvInputEl.setAttribute("class", "card-input");
 
             const cardHolderInputId = 'primer-checkout-card-cardholder-name-input'
             const cardHolderInputEl = document.createElement('input')
             cardHolderInputEl.setAttribute('id', cardHolderInputId)
             cardHolderInputEl.setAttribute('placeholder', 'Cardholder Name')
-            cardHolderInputEl.setAttribute("type", "text");
+            cardHolderInputEl.setAttribute("type", "test");
 
             const submitButton = document.createElement('input')
             const buttonId = 'submit-button'
@@ -299,13 +299,19 @@ async function onLoaded() {
 
             async function configureCardForm() {
 
-              const baseStyles = {
-                height: '30px',
-                margin: '2px',
-                // border: '1px solid rgb(0 0 0 / 10%)',
-                //borderRadius: '2px',
-                //padding: '12px',
-                //boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+              const style = {
+                input: {
+                  base: {
+                    height: "21px",
+                    boxShadow:
+                      "inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;",
+                    boxSizing: "border-box",
+                    fontSize: "11px",
+                    backgroundColor: "#fff",
+                    padding: "3px 4px",
+                    fontFamily: "Pixelated MS Sans Serif, Arial",
+                  },
+                },
               }
 
               // Create the payment method manager
@@ -322,22 +328,24 @@ async function onLoaded() {
               const cvvInput = cardManager.createHostedInput('cvv')
               const expiryInput = cardManager.createHostedInput('expiryDate')
 
+              // const { cardNumberInput, expiryInput, cvvInput } =
+              //   cardManager.createHostedInputs();
 
               await Promise.all([
                 cardNumberInput.render(cardNumberInputId, {
                   placeholder: '1234 1234 1234 1234',
                   ariaLabel: 'Card number',
-                  //        styles: baseStyles,
+                  style,
                 }),
                 expiryInput.render(cardExpiryInputId, {
                   placeholder: 'MM/YY',
                   ariaLabel: 'Expiry date',
-                  styles: baseStyles,
+                  style,
                 }),
                 cvvInput.render(cardCvvInputId, {
                   placeholder: '123',
                   ariaLabel: 'CVV',
-                  styles: baseStyles,
+                  style,
                 }),
               ])
 

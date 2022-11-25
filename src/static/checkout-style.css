@@ -34,6 +34,19 @@ body {
   place-items: center;
 }
 
+.window-body {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+
+#order-container {
+  width: 100%;
+}
+
+
 address {
   font-style: normal;
 }
@@ -72,6 +85,30 @@ legend {
   margin-bottom: 0.5em;
   padding: 0;
 }
+
+#checkout-container {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 98%;
+}
+
+.card-input {
+  height: 30px;
+  margin: 2px;
+}
+
+.apm-button {
+  margin: 5px;
+}
+
+#submit-button {
+  margin: 5px;
+}
+
+
 
 input {
   border: 0;
@@ -148,16 +185,16 @@ tfoot {
 
 .card {
   border-radius: 1em;
-  background-color: #fc8080;
+  background-color: #e54949;
   background-color: var(--color-primary);
-  color: #fff;
+  color: rgb(234, 8, 8);
   padding: 1em;
 }
 
 .form {
   display: grid;
-  grid-gap: 2em;
-  gap: 2em;
+  grid-gap: 1em;
+  gap: 1em;
 }
 
 .form__radios {
