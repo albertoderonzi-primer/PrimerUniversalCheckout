@@ -82,7 +82,7 @@ async function onLoaded() {
       },
       metadata: {
         env: "headless",
-        Test: "True",
+        Test: "False",
       },
     };
   };

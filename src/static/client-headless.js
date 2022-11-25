@@ -207,13 +207,19 @@ async function onLoaded() {
 
           async function configureCardForm() {
 
-            const baseStyles = {
-              height: '30px',
-              margin: '2px',
-              // border: '1px solid rgb(0 0 0 / 10%)',
-              //borderRadius: '2px',
-              //padding: '12px',
-              //boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
+            const style = {
+              input: {
+                base: {
+                  height: "21px",
+                  boxShadow:
+                    "inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;",
+                  boxSizing: "border-box",
+                  fontSize: "11px",
+                  backgroundColor: "#fff",
+                  padding: "3px 4px",
+                  fontFamily: "Pixelated MS Sans Serif, Arial",
+                },
+              },
             }
 
             // Create the payment method manager
@@ -235,17 +241,17 @@ async function onLoaded() {
               cardNumberInput.render(cardNumberInputId, {
                 placeholder: '1234 1234 1234 1234',
                 ariaLabel: 'Card number',
-                //        styles: baseStyles,
+                style,
               }),
               expiryInput.render(cardExpiryInputId, {
                 placeholder: 'MM/YY',
                 ariaLabel: 'Expiry date',
-                styles: baseStyles,
+                style,
               }),
               cvvInput.render(cardCvvInputId, {
                 placeholder: '123',
                 ariaLabel: 'CVV',
-                styles: baseStyles,
+                style,
               }),
             ])
 
