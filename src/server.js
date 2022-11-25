@@ -48,6 +48,7 @@ const PRIMER_API_URL = PRIMER_API_URLS[process.env.PRIMER_API_ENVIRONMENT];
 app.post('/client-session', async (req, res) => {
   const url = `${PRIMER_API_URL}/client-session`;
   console.log("Client Session API: start");
+  const requestBody = req.body.orderInfo;
 
   const response = await fetch(url, {
     method: 'post',
@@ -56,64 +57,66 @@ app.post('/client-session', async (req, res) => {
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
     },
-    body: JSON.stringify({
+    body: JSON.stringify(
+      requestBody),
+      // {
 
 
 
-      // ORIGINAL BODY
-      // Create an orderId for this client session
-      // Make sure to keep track of it: you will later receive updates through Webhooks.
-      orderId: 'order-' + Math.random(),
+      // // ORIGINAL BODY
+      // // Create an orderId for this client session
+      // // Make sure to keep track of it: you will later receive updates through Webhooks.
+      // orderId: 'order-' + Math.random(),
 
-      customerId: "cust-1229",
-      customer: {
-        emailAddress: "test@primer.io",
-        mobileNumber: "+44841234517",
-        firstName: "Albesto",
-        lastName: "Deronzi",
-        shippingAddress: {
-          firstName: "Yogesh",
-          lastName: "Josh",
-          addressLine1: "47A",
-          postalCode: "CB94B9",
-          city: "Cambridge",
-          state: "Cambridgeshire",
-          countryCode: "GB"
-        },
-        billingAddress: {
-          firstName: "Alberto",
-          lastName: "derozi",
-          postalCode: "se108up",
-          addressLine1: "test",
-          addressLine2: "Noida",
-          countryCode: "GB",
-          city: "asdasd "
-        }
-      },
+      // customerId: "cust-1229",
+      // customer: {
+      //   emailAddress: "test@primer.io",
+      //   mobileNumber: "+44841234517",
+      //   firstName: "Albesto",
+      //   lastName: "Deronzi",
+      //   shippingAddress: {
+      //     firstName: "Yogesh",
+      //     lastName: "Josh",
+      //     addressLine1: "47A",
+      //     postalCode: "CB94B9",
+      //     city: "Cambridge",
+      //     state: "Cambridgeshire",
+      //     countryCode: "GB"
+      //   },
+      //   billingAddress: {
+      //     firstName: "Alberto",
+      //     lastName: "derozi",
+      //     postalCode: "se108up",
+      //     addressLine1: "test",
+      //     addressLine2: "Noida",
+      //     countryCode: "GB",
+      //     city: "asdasd "
+      //   }
+      // },
 
       // order: {
       //   lineItems: [{
       //     itemId: "item-1",
       //     description: "My item",
-      //     amount: 1000,
+      //     amount: 100,
       //     quantity: 1
       //   }],
       //   countryCode: "GB"
       // },
-      // 3-character Currency Code used for all the amount of this session
-      amount: 100,
-      currencyCode: "GBP",
-      paymentMethod: {
-        paymentType: "FIRST_PAYMENT",
-        descriptor: "Alberto Transfer",
-        vaultOnSuccess: true
-      },
-      metadata: {
-        Test: "False"
-      }
+      // // 3-character Currency Code used for all the amount of this session
+      // amount: 100,
+      // currencyCode: "GBP",
+      // paymentMethod: {
+      //   paymentType: "FIRST_PAYMENT",
+      //   descriptor: "Alberto Transfer",
+      //   vaultOnSuccess: true
+      // },
+      // metadata: {
+      //   Test: "False"
+      // }
 
-      //       // Check all the other options at https://apiref.primer.io/v2/reference/create_client_side_token_client_session_post
-    }),
+            // Check all the other options at https://apiref.primer.io/v2/reference/create_client_side_token_client_session_post
+   //}),
   }).then(data => data.json());
   console.log("Create Session API: Response");
   console.log(response);
