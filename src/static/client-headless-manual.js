@@ -10,6 +10,9 @@ async function onLoaded() {
   const customerDetails = {
     firstName: document.getElementById("first-name"),
     lastName: document.getElementById("last-name"),
+    emailAddress: document.getElementById("email-address"),
+    mobileNumber: document.getElementById("mobile-number"),
+
   };
   const billingAddress = {
     addressLine1: document.getElementById("address-line1"),
@@ -25,6 +28,8 @@ async function onLoaded() {
     size.value = "l";
     customerDetails.firstName.value = "Alberto";
     customerDetails.lastName.value = "DeRonzi";
+    customerDetails.emailAddress.value = "test@primer.io";
+    customerDetails.mobileNumber.value = "+447532172666";
     billingAddress.addressLine1.value = "1 King Street";
     billingAddress.addressLine2.value = "2 Floor";
     billingAddress.city.value = "London";
@@ -43,6 +48,50 @@ async function onLoaded() {
   };
 
 
+  const getOrderInfo = (currency) => {
+    return {
+      customerId: "cust-1229",
+      orderId: `${Math.random().toString(36).substring(7)}`,
+      currencyCode: currency || "GBP",
+      order: {
+        lineItems: [
+          {
+            itemId: `item-${size.value}`,
+            name: `${quantity.value} Lego${quantity.value > 1 ? "s" : ""
+              } - ${size.value.toUpperCase()}`,
+            description: `${quantity.value} ${size.value.toUpperCase()} Lego`,
+            amount: 1000 * quantity.value,
+            productType: "PHYSICAL",
+          },
+        ],
+        countryCode: billingAddress.country.value,
+      },
+      customer: {
+        firstName: customerDetails.firstName.value,
+        lastName: customerDetails.lastName.value,
+        emailAddress: customerDetails.emailAddress.value,
+        mobileNumber: customerDetails.mobileNumber.value,
+        billingAddress: {
+          addressLine1: billingAddress.addressLine1.value,
+          addressLine2: billingAddress.addressLine2.value,
+          city: billingAddress.city.value,
+          state: billingAddress.state.value,
+          postalCode: billingAddress.postalCode.value,
+          countryCode: billingAddress.country.value,
+        },
+      },
+      metadata: {
+        env: "headless",
+        Test: "True",
+      },
+    };
+  };
+
+
+
+
+
+
   submitFormButton.addEventListener("click", async () => {
     const formValid = validateForm();
     if (formValid === false) {
@@ -50,11 +99,15 @@ async function onLoaded() {
     }
     //const clientSession = await getClientSession();
 
+    const orderInfo = getOrderInfo();
     const clientSession = await fetch('/client-session', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
       },
+      body: JSON.stringify({
+        orderInfo,
+      }),
     }).then(data => data.json())
     console.log("Client Session data:", clientSession);
 
@@ -133,12 +186,23 @@ async function onLoaded() {
       // Send the Payment Method Token to your server
       // to create a payment using Payments API
       //const response = await createPayment(paymentMethodTokenData.token)
+      // const orderInfo = getOrderInfo()
+      const metadata = getOrderInfo().metadata
+      const customerId = getOrderInfo().customerId
+
       const response = await fetch('/create-payment', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 'customerId': "cust-1229", 'paymentMethodToken': paymentMethodTokenData.token, "paymentMethod": { "vaultOnSuccess": true }, "metadata": { "type": "add-card", "processor": "primer" } })
+        //body: JSON.stringify({ 'customerId': "cust-1229", 'paymentMethodToken': paymentMethodTokenData.token, "paymentMethod": { "vaultOnSuccess": true }, "metadata": { "type": "add-card", "processor": "primer" } })
+        body: JSON.stringify({
+          metadata,
+          customerId,
+          'paymentMethodToken': paymentMethodTokenData.token,
+        }),
+
+
 
       }).then(response => response.json())
       //console.log(paymentMethodTokenData.token);
@@ -150,10 +214,12 @@ async function onLoaded() {
 
       // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
       // The checkout will automatically perform the action required by the Workflow.
-      if (response.requiredAction.clientToken) {
-        return handler.continueWithNewClientToken(response.requiredAction.clientToken)
+      // console.log("RequiredAction:", requiredAction);
+      if (response.requiredAction) {
+        if (response.requiredAction.clientToken) {
+          return handler.continueWithNewClientToken(response.requiredAction.clientToken)
+        }
       }
-
       // Display the success screen
       return handler.handleSuccess()
     }
@@ -236,7 +302,7 @@ async function onLoaded() {
               const baseStyles = {
                 height: '30px',
                 margin: '2px',
-               // border: '1px solid rgb(0 0 0 / 10%)',
+                // border: '1px solid rgb(0 0 0 / 10%)',
                 //borderRadius: '2px',
                 //padding: '12px',
                 //boxShadow: '0 4px 8px 0 rgba(0,0,0,0.2)',
@@ -261,7 +327,7 @@ async function onLoaded() {
                 cardNumberInput.render(cardNumberInputId, {
                   placeholder: '1234 1234 1234 1234',
                   ariaLabel: 'Card number',
-          //        styles: baseStyles,
+                  //        styles: baseStyles,
                 }),
                 expiryInput.render(cardExpiryInputId, {
                   placeholder: 'MM/YY',
@@ -310,7 +376,7 @@ async function onLoaded() {
             const container = document.getElementById("checkout-container");
 
             const paymentMethodManager =
-                await headless.createPaymentMethodManager("PAYPAL"); // or APPLE_PAY / GOOGLE_PAY
+              await headless.createPaymentMethodManager("PAYPAL"); // or APPLE_PAY / GOOGLE_PAY
             // Create your button container
             const payPalButton = document.createElement("div");
             const payPalButtonId = "paypal-button";
@@ -321,87 +387,87 @@ async function onLoaded() {
             container.append(payPalButton);
 
             function configurePayPalButton() {
-                // Create the payment method manager
-                const button = paymentMethodManager.createButton();
+              // Create the payment method manager
+              const button = paymentMethodManager.createButton();
 
-                // Render the button
+              // Render the button
 
-                button.render(payPalButtonId, {
-                    style: {
-                        buttonColor: "silver",
-                    },
-                });
+              button.render(payPalButtonId, {
+                style: {
+                  buttonColor: "silver",
+                },
+              });
             }
 
             configurePayPalButton();
             break;
-                }
-                case "APPLE_PAY": {
-                  const container = document.getElementById("checkout-container");
+          }
+          case "APPLE_PAY": {
+            const container = document.getElementById("checkout-container");
 
-                  const paymentMethodManager =
-                      await headless.createPaymentMethodManager("APPLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
-                  // Create your button container
-                  const applePayButton = document.createElement("div");
-                  const applePayButtonId = "apple-pay-button";
-                  applePayButton.setAttribute("type", "button");
-                  applePayButton.setAttribute("id", applePayButtonId);
-                  applePayButton.setAttribute("class", "apm-button");
+            const paymentMethodManager =
+              await headless.createPaymentMethodManager("APPLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
+            // Create your button container
+            const applePayButton = document.createElement("div");
+            const applePayButtonId = "apple-pay-button";
+            applePayButton.setAttribute("type", "button");
+            applePayButton.setAttribute("id", applePayButtonId);
+            applePayButton.setAttribute("class", "apm-button");
 
-                  container.append(applePayButton);
+            container.append(applePayButton);
 
-                  function configureApplePayButton() {
-                      // Create the payment method manager
-                      const button = paymentMethodManager.createButton();
+            function configureApplePayButton() {
+              // Create the payment method manager
+              const button = paymentMethodManager.createButton();
 
-                      // Render the button
+              // Render the button
 
-                      button.render(applePayButton, {
-                          style: {
-                              buttonColor: "white",
-                          },
-                      });
-                  }
+              button.render(applePayButton, {
+                style: {
+                  buttonColor: "white",
+                },
+              });
+            }
 
-                  configureApplePayButton();
+            configureApplePayButton();
 
-                  break;
-              }
-              case "GOOGLE_PAY": {
-                  const container = document.getElementById("checkout-container");
+            break;
+          }
+          case "GOOGLE_PAY": {
+            const container = document.getElementById("checkout-container");
 
-                  const paymentMethodManager =
-                      await headless.createPaymentMethodManager("GOOGLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
-                  // Create your button container
-                  const googlePayButton = document.createElement("div");
-                  const googlePayId = "google-pay-button";
-                  googlePayButton.setAttribute("type", "button");
-                  googlePayButton.setAttribute("id", googlePayId);
-                  googlePayButton.setAttribute("class", "apm-button");
+            const paymentMethodManager =
+              await headless.createPaymentMethodManager("GOOGLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
+            // Create your button container
+            const googlePayButton = document.createElement("div");
+            const googlePayId = "google-pay-button";
+            googlePayButton.setAttribute("type", "button");
+            googlePayButton.setAttribute("id", googlePayId);
+            googlePayButton.setAttribute("class", "apm-button");
 
-                  container.append(googlePayButton);
+            container.append(googlePayButton);
 
-                  function configureGooglePayButton() {
-                      // Create the payment method manager
-                      const button = paymentMethodManager.createButton();
+            function configureGooglePayButton() {
+              // Create the payment method manager
+              const button = paymentMethodManager.createButton();
 
-                      // Render the button
+              // Render the button
 
-                      button.render(googlePayId, {
-                          style: {
-                              buttonColor: "white",
-                          },
-                      });
-                  }
+              button.render(googlePayId, {
+                style: {
+                  buttonColor: "white",
+                },
+              });
+            }
 
-                  configureGooglePayButton();
+            configureGooglePayButton();
 
-                  break;
-              }
+            break;
+          }
 
 
 
-              }
+        }
       }
     }
 
