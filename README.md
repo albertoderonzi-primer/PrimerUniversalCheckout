@@ -28,16 +28,10 @@ To run this project locally
   npm install
 ```
 
-- Change `example.env` -> `.env` and add your Primer API key
+- Change `env.example` -> `.env` and add your Primer API key
 
 ```bash
-  mv example.env .env
-```
-
-- To run in development mode 
-
-```bash
-  npm run dev
+  mv env.example .env
 ```
 
 - To run in "production" mode
