@@ -155,7 +155,6 @@ async function onLoaded() {
       container: '#checkout-container',
       paymentHandling: 'MANUAL',
 
-
       async onTokenizeSuccess(paymentMethodTokenData, handler) {
         // Send the Payment Method Token to your server
         // to create a payment using Payments API
@@ -196,6 +195,7 @@ async function onLoaded() {
         // Display the success screen
         return handler.handleSuccess()
       },
+
 
       async onResumeSuccess(resumeTokenData, handler) {
         // Send the resume token to your server to resume the payment

@@ -1,171 +1,12 @@
-window.addEventListener("load", onLoaded);
+// import {greet,message} from "./headless.js";
+// const greet_scaler = greet("Scaler");
 
-async function onLoaded() {
-
-  const submitFormButton = document.getElementById("submit-button");
-  const autofillFormButton = document.getElementById("autofill-button");
-  const quantity = document.getElementById("quantity");
-  const size = document.getElementById("size");
-
-  const customerDetails = {
-    firstName: document.getElementById("first-name"),
-    lastName: document.getElementById("last-name"),
-    emailAddress: document.getElementById("email-address"),
-    mobileNumber: document.getElementById("mobile-number"),
-
-  };
-  const billingAddress = {
-    addressLine1: document.getElementById("address-line1"),
-    addressLine2: document.getElementById("address-line2"),
-    city: document.getElementById("city"),
-    state: document.getElementById("state"),
-    postalCode: document.getElementById("postal-code"),
-    country: document.getElementById("country"),
-  };
-
-  const autofillForm = () => {
-    quantity.value = 2;
-    size.value = "l";
-    customerDetails.firstName.value = "Alberto";
-    customerDetails.lastName.value = "DeRonzi";
-    customerDetails.emailAddress.value = "test@primer.io";
-    customerDetails.mobileNumber.value = "+447532172666";
-    billingAddress.addressLine1.value = "1 King Street";
-    billingAddress.addressLine2.value = "2 Floor";
-    billingAddress.city.value = "London";
-    billingAddress.state.value = "GB";
-    billingAddress.postalCode.value = "SE10";
-    billingAddress.country.value = "GB";
-  };
-
-  autofillFormButton.addEventListener("click", autofillForm);
-
-  const clearCheckoutDiv = () => {
-    document.querySelector("#shirt-purchase-form").remove();
-    document
-      .querySelector("#order-container")
-      .setAttribute("id", "checkout-container");
-  };
+// console.log(greet_scaler);
+// console.log(message);
 
 
-  const getOrderInfo = (currency) => {
-    return {
-      customerId: "cust-1229",
-      orderId: `${Math.random().toString(36).substring(7)}`,
-      currencyCode: currency || "GBP",
-      order: {
-        lineItems: [
-          {
-            itemId: `item-${size.value}`,
-            name: `${quantity.value} Lego${quantity.value > 1 ? "s" : ""
-              } - ${size.value.toUpperCase()}`,
-            description: `${quantity.value} ${size.value.toUpperCase()} Lego`,
-            amount: 10000 * quantity.value,
-            productType: "PHYSICAL",
-          },
-        ],
-        countryCode: billingAddress.country.value,
-      },
-      customer: {
-        firstName: customerDetails.firstName.value,
-        lastName: customerDetails.lastName.value,
-        emailAddress: customerDetails.emailAddress.value,
-        mobileNumber: customerDetails.mobileNumber.value,
-        billingAddress: {
-          addressLine1: billingAddress.addressLine1.value,
-          addressLine2: billingAddress.addressLine2.value,
-          city: billingAddress.city.value,
-          state: billingAddress.state.value,
-          postalCode: billingAddress.postalCode.value,
-          countryCode: billingAddress.country.value,
-        },
-      },
-      metadata: {
-        env: "headless",
-        Test: "False",
-      },
-    };
-  };
-
-
-
-
-
-
-  submitFormButton.addEventListener("click", async () => {
-    const formValid = validateForm();
-    if (formValid === false) {
-      return;
-    }
-    //const clientSession = await getClientSession();
-
-    const orderInfo = getOrderInfo();
-    const clientSession = await fetch('/client-session', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        orderInfo,
-      }),
-    }).then(data => data.json())
-    console.log("Client Session data:", clientSession);
-
-    const { clientToken } = clientSession
-    console.log("Client token:", clientToken);
-
-
-    if (!clientSession) {
-      console.log("Error, no client session");
-      return;
-    } else {
-      console.log("client session: ", clientSession);
-    }
-
-    clearCheckoutDiv();
-
-    await renderCheckout(clientToken);
-  });
-
-
-
-
-
-  const validateForm = () => {
-    if (quantity.value < 1) {
-      alert("Please enter a quantity of at least 1");
-      return false;
-    }
-    for (const value in customerDetails) {
-      if (customerDetails[value].value === "") {
-        alert("Please fill out all customer details");
-        return false;
-      }
-    }
-    for (const value in billingAddress) {
-      if (billingAddress[value].value === "") {
-        alert("Please fill out all billing address fields");
-        return false;
-      }
-    }
-  };
-
-
-
-
-  // const clientSession = await fetch('/client-session', {
-  //   method: 'post',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  // }).then(data => data.json())
-  // console.log("Client Session data:", clientSession);
-
-  //  const { clientToken } = clientSession
-  //  console.log("Client token:", clientToken);
-
-
-  const renderCheckout = async (clientToken) => {
+  // Render the Headless Checkout
+export function renderCheckout async (clientToken) => {
 
     const { Primer } = window
 
@@ -191,12 +32,12 @@ async function onLoaded() {
       const currencyCode = getOrderInfo().currencyCode
       const amount = getOrderInfo().order.lineItems[0].amount
 
+      // Because it's manual flow, we need to make a manual Create Payment Call
       const response = await fetch('/create-payment', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json'
         },
-        //body: JSON.stringify({ 'customerId': "cust-1229", 'paymentMethodToken': paymentMethodTokenData.token, "paymentMethod": { "vaultOnSuccess": true }, "metadata": { "type": "add-card", "processor": "primer" } })
         body: JSON.stringify({
           currencyCode,
           amount,
@@ -218,6 +59,7 @@ async function onLoaded() {
 
       // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
       // The checkout will automatically perform the action required by the Workflow.
+      // This function is used for 3DS or other APM actions
       // console.log("RequiredAction:", requiredAction);
       if (response.requiredAction) {
         if (response.requiredAction.clientToken) {
@@ -230,7 +72,6 @@ async function onLoaded() {
 
     async function onResumeSuccess(resumeTokenData, handler) {
       // Send the resume token to your server to resume the payment
-      //  const response = await resumePayment(resumeTokenData.resumeToken)
       const response = await fetch('/resume', {
         method: 'post',
         headers: {
@@ -258,10 +99,12 @@ async function onLoaded() {
       return handler.handleSuccess()
     }
 
+    // Headless specific functions: This will list all the available payment method
     async function onAvailablePaymentMethodsLoad(paymentMethodTypes) {
       // Called when the available payment methods are retrieved
       console.log("Available Payment Methods:", paymentMethodTypes);
 
+      // Iterate across payment methods
       for (const paymentMethodType of paymentMethodTypes) {
         switch (paymentMethodType) {
           case 'PAYMENT_CARD': {
@@ -303,6 +146,7 @@ async function onLoaded() {
 
             async function configureCardForm() {
 
+              // Define style for inputs
               const style = {
                 input: {
                   base: {
@@ -331,9 +175,6 @@ async function onLoaded() {
               const cardNumberInput = cardManager.createHostedInput('cardNumber')
               const cvvInput = cardManager.createHostedInput('cvv')
               const expiryInput = cardManager.createHostedInput('expiryDate')
-
-              // const { cardNumberInput, expiryInput, cvvInput } =
-              //   cardManager.createHostedInputs();
 
               await Promise.all([
                 cardNumberInput.render(cardNumberInputId, {
@@ -482,7 +323,8 @@ async function onLoaded() {
         }
       }
     }
-
+  }
+    // This function is not available in Manual Flow.
     // function onCheckoutComplete({
     //   payment
     // }) {
@@ -493,29 +335,3 @@ async function onLoaded() {
     //   alert(`Payment complete! \n\n ${JSON.stringify(payment)}`);
 
     // }
-
-    function onCheckoutFail(error, {
-      payment
-    }, handler) {
-      // Notifies you that the checkout flow has failed and a payment could not be created
-      // This callback can also be used to display an error state within your own UI.
-
-      // ⚠️ `handler` is undefined if the SDK does not expect anything from you
-      if (!handler) {
-        return
-      }
-
-      // ⚠️ If `handler` exists, you MUST call one of the functions of the handler
-
-      // Show a default error message
-      return handler.showErrorMessage()
-    }
-
-
-
-    // Start the headless checkout
-    await headless.start()
-
-    console.log('Headless Universal Checkout (Manual Flow) is loaded!')
-  }
-}

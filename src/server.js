@@ -212,7 +212,7 @@ const getOrderInfo = () => {
       vaultOnSuccess: true
     },
     metadata: {
-      Test: "False"
+      Test: "True"
     },
 
     //        Check all the other options at https://apiref.primer.io/v2/reference/create_client_side_token_client_session_post

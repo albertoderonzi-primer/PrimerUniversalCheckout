@@ -153,6 +153,12 @@ async function onLoaded() {
       // Specify the selector of the container element
       container: '#checkout-container',
 
+      onBeforePaymentCreate(data,handler){
+
+        console.log("On before Payment Create:", data);
+        return handler.continuePaymentCreation();
+      },
+
       /**
        * When the checkout flow has been completed, you'll receive
        * the successful payment via `onCheckoutComplete`.
@@ -161,6 +167,8 @@ async function onLoaded() {
       onCheckoutComplete({ payment }) {
         console.log('Checkout Complete!', payment)
       },
+
+
 
       /**
        * Learn more about the other options at:

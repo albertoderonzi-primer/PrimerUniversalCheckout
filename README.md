@@ -9,13 +9,11 @@ You can run:
 2a Primer Headless Checkout Standard Flow  
 2b Primer Headless Checkout Manual Flow  
 
-For Drop-in select 'checkout-original.html' in `server.js` row 18
-- For Standard Flow use `client.js`  in checkout-original.html row 29
-- For Manual Flow use `client-manual.js` in checkout-original.html row 29
 
-For Headless select 'checkout-headless.html' in `server.js` row 18
-- For Standard Flow use `client-headless.js`  in checkout-headless.html row 61
-- For Manual Flow use `client-headless-manual.js` in checkout-headless.html row 61
+- For Standard Flow use `client.js`  in checkout-headless.html row 66
+- For Manual Flow use `client-manual.js` in checkout-headless.html row 66
+- For Standard Flow use `client-headless.js`  in checkout-headless.html row 66
+- For Manual Flow use `client-headless-manual.js` in checkout-headless.html row 66
 
 
 ## Deployment
