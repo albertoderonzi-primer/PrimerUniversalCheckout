@@ -103,7 +103,8 @@ async function onLoaded() {
     const clientSession = await fetch('/client-session', {
       method: 'post',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Legacy-workflows' : 'false'
       },
       body: JSON.stringify({
         orderInfo,
@@ -194,7 +195,9 @@ async function onLoaded() {
       const response = await fetch('/create-payment', {
         method: 'post',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Legacy-workflows' : 'false'
+
         },
         //body: JSON.stringify({ 'customerId': "cust-1229", 'paymentMethodToken': paymentMethodTokenData.token, "paymentMethod": { "vaultOnSuccess": true }, "metadata": { "type": "add-card", "processor": "primer" } })
         body: JSON.stringify({
@@ -251,6 +254,8 @@ async function onLoaded() {
       // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
       // The checkout will automatically perform the action required by the Workflow
       if (response.requiredAction) {
+        console.log("in required Action", response.requiredAction.clientToken);
+
         return handler.continueWithNewClientToken(response.requiredAction.clientToken)
       }
 
@@ -262,7 +267,7 @@ async function onLoaded() {
       // Called when the available payment methods are retrieved
       console.log("Available Payment Methods:", paymentMethodTypes);
 
-      for (const paymentMethodType of paymentMethodTypes) {
+      for (const paymentMethodType of paymentMethodTypes.type) {
         switch (paymentMethodType) {
           case 'PAYMENT_CARD': {
             //headless web UI config

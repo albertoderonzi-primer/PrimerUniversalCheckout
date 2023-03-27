@@ -24,7 +24,7 @@ async function onLoaded() {
   };
 
   const autofillForm = () => {
-    quantity.value = 2;
+    quantity.value = 1;
     size.value = "l";
     customerDetails.firstName.value = "Alberto";
     customerDetails.lastName.value = "DeRonzi";
@@ -50,9 +50,9 @@ async function onLoaded() {
 
   const getOrderInfo = (currency) => {
     return {
-      customerId: "cust-1229",
+      customerId: "alberto_test",
       orderId: `${Math.random().toString(36).substring(7)}`,
-      currencyCode: currency || "GBP",
+      currencyCode: currency || "EUR",
       order: {
         lineItems: [
           {
@@ -60,7 +60,7 @@ async function onLoaded() {
             name: `${quantity.value} Lego${quantity.value > 1 ? "s" : ""
               } - ${size.value.toUpperCase()}`,
             description: `${quantity.value} ${size.value.toUpperCase()} Lego`,
-            amount: 10000 * quantity.value,
+            amount: 1234 * quantity.value,
             productType: "PHYSICAL",
           },
         ],
@@ -81,9 +81,18 @@ async function onLoaded() {
         },
       },
       metadata: {
-        env: "headless",
-        Test: "False",
-      },
+     //  workflow: "3ds_braintree",
+     //  v1: true,
+     //paypal_client_metadata_id: "6056a4e0dccf603087c289e9301cc1",
+    // custom_id: "repay-6056a4e0dccf603087c289e9301cab",
+    //primer_credit_card: "checkout"
+          },
+      paymentMethod: {
+       // paymentType: "UNSCHEDULED",
+        vaultOnSuccess: true,
+        descriptor:"test"
+
+    },
     };
   };
 
@@ -99,23 +108,25 @@ async function onLoaded() {
     const clientSession = await fetch('/client-session', {
       method: 'post',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Legacy-workflows' : 'true'
+
       },
       body: JSON.stringify({
         orderInfo,
       }),
     }).then(data => data.json())
-    console.log("Client Session data:", clientSession);
+    console.log("C - Client Session data:", clientSession);
 
     const { clientToken } = clientSession
-    console.log("Client token:", clientToken);
+    console.log("C - Client token:", clientToken);
 
 
     if (!clientSession) {
-      console.log("Error, no client session");
+      console.log("C - Error, no client session");
       return;
     } else {
-      console.log("client session: ", clientSession);
+      console.log("C - client session: ", clientSession);
     }
 
     clearCheckoutDiv();
@@ -148,20 +159,38 @@ async function onLoaded() {
 
 
   const renderCheckout = async (clientToken) => {
-
-    const universalCheckout = await Primer.showUniversalCheckout(clientToken, {
-      // Specify the selector of the container element
+    const options ={
       container: '#checkout-container',
+      paypal: {
+    //    paymentFlow: "PREFER_VAULT"
+      },
+      onCheckoutComplete({ payment }) {
+        console.log('Checkout Complete!', payment)
+      },
+
+      onCheckoutFail(error, { payment }, handler) {
+        console.log('Checkout Fail!', error, payment)
+    }
+    }
+
+     const universalCheckout = await Primer.showUniversalCheckout(clientToken,options, {
+     // const universalCheckout = await Primer.showVaultManager(clientToken, {
+
+
+      // Specify the selector of the container element
 
       /**
        * When the checkout flow has been completed, you'll receive
        * the successful payment via `onCheckoutComplete`.
        * Implement this callback to redirect the user to an order confirmation page and fulfill the order.
        */
-      onCheckoutComplete({ payment }) {
-        console.log('Checkout Complete!', payment)
-      },
+      // onCheckoutComplete({ payment }) {
+      //   console.log('Checkout Complete!', payment)
+      // },
 
+    //   onCheckoutFail(error, { payment }, handler) {
+    //     console.log('Checkout Fail!', error, payment)
+    // },
       /**
        * Learn more about the other options at:
        * https://primer.io/docs

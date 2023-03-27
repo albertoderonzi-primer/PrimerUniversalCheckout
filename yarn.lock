@@ -42,10 +42,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@primer-io/checkout-web@^2.7.0":
-  "integrity" "sha512-jq34Pqdq6x3lP+w1pr6FTCyR+m8nerTpA0THRjo2AbYyloaec7IX7FdEWtDy8tKJL29AFdIZMsw79N8vTaCCRg=="
-  "resolved" "https://registry.npmjs.org/@primer-io/checkout-web/-/checkout-web-2.7.0.tgz"
-  "version" "2.7.0"
+"@primer-io/checkout-web@^2.27.1":
+  "integrity" "sha512-lXOyiiADxBNwtv0oGVccXn1tQg5yZuglxb+Jp12qOezVBiGHa245yKkJ1+HezdQp4BIOpjtFAHhjI22cMBg2Ww=="
+  "resolved" "https://registry.npmjs.org/@primer-io/checkout-web/-/checkout-web-2.27.1.tgz"
+  "version" "2.27.1"
 
 "@types/eslint-scope@^3.7.3":
   "integrity" "sha512-9K4zoImiZc3HlIp6AVUDE4CWYx22a+lhSZMYNpbjW04+YF0KWj4pJXnEMjdnFTiQibFFmElcsasJXDbdI/EPhA=="

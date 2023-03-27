@@ -49,13 +49,16 @@ const PRIMER_API_URL = PRIMER_API_URLS[process.env.PRIMER_API_ENVIRONMENT];
 
 app.post('/client-session', async (req, res) => {
   const url = `${PRIMER_API_URL}/client-session`;
-  console.log("Client Session API: start");
+  console.log("S - Client Session API: start");
   let requestBody = req.body.orderInfo;
-  console.log("Request Body:", requestBody);
+  console.log("S - Request Body:", requestBody);
 
   // If the order details are not passed from the front end, get the info from hardcoded data in the backend.
-  if (!requestBody) { requestBody = getOrderInfo() }
-  console.log("Request Body:", requestBody);
+  if (!requestBody) {
+    console.log("S - Requestiing order info");
+    requestBody = getOrderInfo() }
+
+  console.log("S - Request Body:", requestBody);
 
   const response = await fetch(url, {
     method: 'post',
@@ -63,22 +66,23 @@ app.post('/client-session', async (req, res) => {
       'Content-Type': 'application/json',
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
+      'Legacy-workflows' : 'true'
     },
     body: JSON.stringify(requestBody),
   }).then(data => data.json());
 
-  console.log("Create Session API: Response", response);
+  console.log("S - Create Session API: Response", response);
   return res.send(response);
 });
 
 
 // Second API Call (used only in manual Flow): Create payment
 app.post('/create-payment', async (req, res) => {
-  console.log("Create Payment API: Start");
+  console.log("S - Create Payment API: Start");
 
   const url = `${PRIMER_API_URL}/payments`;
 
-  console.log("Create Payment API: body");
+  console.log("S - Create Payment API: body");
   console.log(req.body);
 
   const api_body = req.body;
@@ -112,7 +116,7 @@ app.post('/resume', async (req, res) => {
   console.log(req.body);
 
   const api_body = req.body;
-
+//TODO add check on response
   const response = await fetch(url, {
     method: 'post',
     headers: {
@@ -168,15 +172,15 @@ const getOrderInfo = () => {
     // Make sure to keep track of it: you will later receive updates through Webhooks.
     orderId: 'order-' + Math.random(),
 
-    customerId: "cust-1229",
+    customerId: "albertoTest1",
     customer: {
       emailAddress: "test@primer.io",
       mobileNumber: "+44841234517",
-      firstName: "Albesto",
+      firstName: "Alberto",
       lastName: "Deronzi",
       shippingAddress: {
-        firstName: "Yogesh",
-        lastName: "Josh",
+        firstName: "Alberto",
+        lastName: "Deronzi",
         addressLine1: "47A",
         postalCode: "CB94B9",
         city: "Cambridge",
@@ -185,12 +189,12 @@ const getOrderInfo = () => {
       },
       billingAddress: {
         firstName: "Alberto",
-        lastName: "derozi",
+        lastName: "Deronzi",
         postalCode: "se108up",
         addressLine1: "test",
-        addressLine2: "Noida",
+        addressLine2: "test",
         countryCode: "GB",
-        city: "asdasd "
+        city: "london "
       }
     },
 
