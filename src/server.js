@@ -18,6 +18,7 @@ const staticDir = path.join(__dirname, 'static');
 // for Headless select checkout-headless.html
 // DEPRECATED - for dropin select checkout-original.html 
 const checkoutPage = path.join(__dirname, 'static', 'checkout-headless.html');
+const applepayfile = path.join(__dirname, 'static/.well-known', 'apple-developer-merchantid-domain-association');
 
 
 // setting up cors
@@ -29,6 +30,10 @@ app.use('/static', express.static(staticDir));
 
 app.get('/', (req, res) => {
   return res.sendFile(checkoutPage);
+});
+
+app.get('/.well-known/apple-developer-merchantid-domain-association', (req, res) => {
+  return res.sendFile(applepayfile);
 });
 
 ///////////////////////////////////////////
@@ -66,7 +71,7 @@ app.post('/client-session', async (req, res) => {
       'Content-Type': 'application/json',
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
-      'Legacy-workflows' : 'true'
+      'Legacy-workflows' : 'false'
     },
     body: JSON.stringify(requestBody),
   }).then(data => data.json());

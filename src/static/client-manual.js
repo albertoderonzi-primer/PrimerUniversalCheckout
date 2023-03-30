@@ -81,8 +81,8 @@ async function onLoaded() {
         },
       },
       metadata: {
-      //  workflow: "3ds_braintree",
-      //  v1: true
+        workflow: "3ds_braintree",
+        v1: true
      // paypal_client_metadata_id: "6056a4e0dccf603087c289e9301cc1",
       //custom_id: "repay-6056a4e0dccf603087c289e9301cab",
        },
@@ -107,7 +107,7 @@ async function onLoaded() {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
-        'Legacy-workflows' : 'true'
+        'Legacy-workflows' : 'false'
 
       },
       body: JSON.stringify({
@@ -160,6 +160,7 @@ async function onLoaded() {
 
     const options ={
       container: '#checkout-container',
+      paymentHandling: 'MANUAL',
       paypal: {
         paymentFlow: "PREFER_VAULT"
       },
@@ -169,121 +170,113 @@ async function onLoaded() {
     style: {
         /* Style options */
     },
+
+    async onTokenizeSuccess(paymentMethodTokenData, handler) {
+      // Send the Payment Method Token to your server
+      // to create a payment using Payments API
+      //const response = await createPayment(paymentMethodTokenData.token)
+
+      const metadata = getOrderInfo().metadata
+      const customerId = getOrderInfo().customerId
+      const orderId = getOrderInfo().orderId
+      const currencyCode = getOrderInfo().currencyCode
+      const amount = getOrderInfo().order.lineItems[0].amount
+      console.log("before create payment");
+
+      const response = await fetch('/create-payment', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Legacy-workflows' : 'false'
+
+        },
+        body: JSON.stringify({
+          currencyCode,
+          amount,
+          metadata,
+          customerId,
+          orderId,
+          'paymentMethodToken': paymentMethodTokenData.token,
+        }),
+      }).then(response => response.json())
+      console.log(paymentMethodTokenData.token);
+      console.log("On Tokenise Success Response:", response);
+      // Call `handler.handleFailure` to cancel the flow and display an error message
+      if (!response) {
+        return handler.handleFailure('The payment failed. Please try with another payment method.')
+      }
+
+      // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
+      // The checkout will automatically perform the action required by the Workflow.
+      if (response.requiredAction) {
+        return handler.continueWithNewClientToken(response.requiredAction.clientToken)
+      }
+
+      // Display the success screen
+      return handler.handleSuccess()
+    },
+    async onResumePending(paymentMethodData) {
+      console.log("On Resume Pending start",paymentMethodData);
+
+      switch (paymentMethodData.paymentMethodType) {
+        case PaymentMethodType.ADYEN_MULTIBANCO:
+          // Use paymentMethodData within own UI
+          // Share payment information with your customer
+          console.log("On Resume Pending Multibanco");
+
+          break;
+        default:
+        // show success screen
+        console.log("On Resume Pending Default");
+
+      }
+    },
+
+    async onResumeSuccess(resumeTokenData, handler) {
+      // Send the resume token to your server to resume the payment
+      //  const response = await resumePayment(resumeTokenData.resumeToken)
+      const response = await fetch('/resume', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Legacy-workflows' : 'false'
+
+        },
+        body: JSON.stringify({ 'resumeToken': resumeTokenData.resumeToken })
+
+      }).then(response => response.json())
+      console.log("On Resume Response:", response);
+
+
+
+      // Call `handler.handleFailure` to cancel the flow and display an error message
+      if (!response) {
+        return handler.handleFailure('The payment failed. Please try with another payment method.')
+      }
+
+      // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
+      // The checkout will automatically perform the action required by the Workflow
+      if (response.requiredAction) {
+        console.log("in required Action", response.requiredAction.clientToken);
+
+        return handler.continueWithNewClientToken(response.requiredAction.clientToken)
+      }
+
+        else {
+          console.log("in ELSE", response);
+
+        }
+
+      // Display the success screen
+      console.log("Success!");
+      return handler.handleSuccess()
+    }
+
+
+
   }
     const universalCheckout = await Primer.showUniversalCheckout(clientToken,options, {
-      // Specify the selector of the container element
-      async onTokenizeSuccess(paymentMethodTokenData, handler) {
-        // Send the Payment Method Token to your server
-        // to create a payment using Payments API
-        //const response = await createPayment(paymentMethodTokenData.token)
-
-        const metadata = getOrderInfo().metadata
-        const customerId = getOrderInfo().customerId
-        const orderId = getOrderInfo().orderId
-        const currencyCode = getOrderInfo().currencyCode
-        const amount = getOrderInfo().order.lineItems[0].amount
-        console.log("before create payment");
-
-        const response = await fetch('/create-payment', {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-            'Legacy-workflows' : 'true'
-
-          },
-          body: JSON.stringify({
-            currencyCode,
-            amount,
-            metadata,
-            customerId,
-            orderId,
-            'paymentMethodToken': paymentMethodTokenData.token,
-          }),
-        }).then(response => response.json())
-        console.log(paymentMethodTokenData.token);
-        console.log("On Tokenise Success Response:", response);
-        // Call `handler.handleFailure` to cancel the flow and display an error message
-        if (!response) {
-          return handler.handleFailure('The payment failed. Please try with another payment method.')
-        }
-
-        // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
-        // The checkout will automatically perform the action required by the Workflow.
-        if (response.requiredAction) {
-          return handler.continueWithNewClientToken(response.requiredAction.clientToken)
-        }
-
-        // Display the success screen
-        return handler.handleSuccess()
-      },
-
-
-      // TODO : CHECK THIS FUNCTION
-      async onResumePending(paymentMethodData) {
-        console.log("On Resume Pending start",paymentMethodData);
-
-        switch (paymentMethodData.paymentMethodType) {
-          case PaymentMethodType.ADYEN_MULTIBANCO:
-            // Use paymentMethodData within own UI
-            // Share payment information with your customer
-            console.log("On Resume Pending Multibanco");
-
-            break;
-          default:
-          // show success screen
-          console.log("On Resume Pending Default");
-
-        }
-      },
-
-      async onResumeSuccess(resumeTokenData, handler) {
-        // Send the resume token to your server to resume the payment
-        //  const response = await resumePayment(resumeTokenData.resumeToken)
-        const response = await fetch('/resume', {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/json',
-   //         'Legacy-workflows' : 'false'
-
-          },
-          body: JSON.stringify({ 'resumeToken': resumeTokenData.resumeToken })
-
-        }).then(response => response.json())
-        console.log("On Resume Response:", response);
-
-
-
-        // Call `handler.handleFailure` to cancel the flow and display an error message
-        if (!response) {
-          return handler.handleFailure('The payment failed. Please try with another payment method.')
-        }
-
-        // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
-        // The checkout will automatically perform the action required by the Workflow
-        if (response.requiredAction) {
-          console.log("in required Action", response.requiredAction.clientToken);
-
-          return handler.continueWithNewClientToken(response.requiredAction.clientToken)
-        }
-
-          else {
-            console.log("in ELSE", response);
-
-          }
-
-        // Display the success screen
-        console.log("Success!");
-        return handler.handleSuccess()
-      },
-
-
-
-
-      /**
-       * Learn more about the other options at:
-       * https://primer.io/docs
-       * https://www.npmjs.com/package/@primer-io/checkout-web
-       */
+ 
     })
 
 

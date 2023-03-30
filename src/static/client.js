@@ -50,9 +50,9 @@ async function onLoaded() {
 
   const getOrderInfo = (currency) => {
     return {
-      customerId: "alberto_test",
+      customerId: "alberto_test_1235",
       orderId: `${Math.random().toString(36).substring(7)}`,
-      currencyCode: currency || "EUR",
+      currencyCode: currency || "GBP",
       order: {
         lineItems: [
           {
@@ -60,7 +60,7 @@ async function onLoaded() {
             name: `${quantity.value} Lego${quantity.value > 1 ? "s" : ""
               } - ${size.value.toUpperCase()}`,
             description: `${quantity.value} ${size.value.toUpperCase()} Lego`,
-            amount: 1234 * quantity.value,
+            amount: 5100 * quantity.value,
             productType: "PHYSICAL",
           },
         ],
@@ -79,16 +79,17 @@ async function onLoaded() {
           postalCode: billingAddress.postalCode.value,
           countryCode: billingAddress.country.value,
         },
+        nationalDocumentId: "12345678",
       },
       metadata: {
-     //  workflow: "3ds_braintree",
+       workflow: "klarna2",
      //  v1: true,
      //paypal_client_metadata_id: "6056a4e0dccf603087c289e9301cc1",
     // custom_id: "repay-6056a4e0dccf603087c289e9301cab",
     //primer_credit_card: "checkout"
           },
       paymentMethod: {
-       // paymentType: "UNSCHEDULED",
+      //  paymentType: "ECOMMERCE",
         vaultOnSuccess: true,
         descriptor:"test"
 
@@ -109,7 +110,7 @@ async function onLoaded() {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
-        'Legacy-workflows' : 'true'
+        'Legacy-workflows' : 'false'
 
       },
       body: JSON.stringify({
@@ -152,7 +153,7 @@ async function onLoaded() {
     for (const value in billingAddress) {
       if (billingAddress[value].value === "") {
         alert("Please fill out all billing address fields");
-        return false;
+        return true;
       }
     }
   };
@@ -161,16 +162,24 @@ async function onLoaded() {
   const renderCheckout = async (clientToken) => {
     const options ={
       container: '#checkout-container',
-      paypal: {
-    //    paymentFlow: "PREFER_VAULT"
-      },
+       paypal: {
+         paymentFlow: "PREFER_VAULT"
+       },
       onCheckoutComplete({ payment }) {
         console.log('Checkout Complete!', payment)
+      },
+      googlePay: {
+        captureBillingAddress: true,
       },
 
       onCheckoutFail(error, { payment }, handler) {
         console.log('Checkout Fail!', error, payment)
-    }
+    },
+
+    onClientSessionUpdate(clientSession)
+    {
+      console.log('Client session Update!', clientSession)
+  }
     }
 
      const universalCheckout = await Primer.showUniversalCheckout(clientToken,options, {

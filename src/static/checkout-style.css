@@ -35,10 +35,8 @@ body {
 }
 
 .window-body {
-  display: flex;
   flex-direction: row;
   justify-content: space-between;
-  flex-wrap: wrap;
 }
 
 
@@ -87,12 +85,11 @@ legend {
 }
 
 #checkout-container {
-  width: 48%;
-  display: flex;
+  width: 100%;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  max-width: 98%;
+  max-width: 150%;
 }
 
 .card-input {
