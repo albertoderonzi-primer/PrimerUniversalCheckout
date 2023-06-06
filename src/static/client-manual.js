@@ -50,7 +50,7 @@ async function onLoaded() {
 
   const getOrderInfo = (currency) => {
     return {
-     // customerId: "albertoTest1",
+      customerId: "albertoanthony2",
       orderId: `${Math.random().toString(36).substring(7)}`,
       currencyCode: currency || "GBP",
       order: {
@@ -81,11 +81,12 @@ async function onLoaded() {
         },
       },
       metadata: {
-        workflow: "3ds_braintree",
+     //  workflow: "3ds_braintree",
         v1: true
      // paypal_client_metadata_id: "6056a4e0dccf603087c289e9301cc1",
       //custom_id: "repay-6056a4e0dccf603087c289e9301cab",
        },
+
        paymentMethod: {
         // paymentType: "UNSCHEDULED",
          vaultOnSuccess: true,
@@ -107,7 +108,7 @@ async function onLoaded() {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
-        'Legacy-workflows' : 'false'
+        'Legacy-workflows' : 'true'
 
       },
       body: JSON.stringify({
@@ -270,7 +271,24 @@ async function onLoaded() {
       // Display the success screen
       console.log("Success!");
       return handler.handleSuccess()
-    }
+    },
+
+    onPaymentMethodAction(paymentMethodAction, data)
+    {
+      console.log('OnPaymentAction', data)
+
+    },
+    
+    handleonPaymentMethodAction(paymentMethodAction, data)
+    {
+      console.log('Handle_OnPaymentAction', data)
+
+    },
+
+    onClientSessionUpdate(clientSession)
+    {
+      console.log('Client session Update!', clientSession)
+  }
 
 
 

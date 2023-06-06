@@ -48,6 +48,7 @@ const PRIMER_API_URLS = {
 const API_KEY = process.env.API_KEY;
 const API_VERSION = process.env.API_VERSION;
 const PRIMER_API_URL = PRIMER_API_URLS[process.env.PRIMER_API_ENVIRONMENT];
+const LEGACY_WORKFLOW = process.env.LEGACY_WORKFLOW;
 
 // First API Call: Create client session. This will return a client token that needs to be passed back to front-end
 // to load the SDK
@@ -71,10 +72,10 @@ app.post('/client-session', async (req, res) => {
       'Content-Type': 'application/json',
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
-      'Legacy-workflows' : 'false'
+      'Legacy-workflows' :LEGACY_WORKFLOW
     },
     body: JSON.stringify(requestBody),
-  }).then(data => data.json());
+}).then(data => data.json());
 
   console.log("S - Create Session API: Response", response);
   return res.send(response);
@@ -99,6 +100,8 @@ app.post('/create-payment', async (req, res) => {
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
       'X-Idempotency-Key': '1112' + Math.random(),
+      'Legacy-workflows' :LEGACY_WORKFLOW
+
     },
 
     body: JSON.stringify(api_body),
@@ -128,6 +131,8 @@ app.post('/resume', async (req, res) => {
       'Content-Type': 'application/json',
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
+      'Legacy-workflows' :LEGACY_WORKFLOW
+
     },
 
     body: JSON.stringify(api_body),

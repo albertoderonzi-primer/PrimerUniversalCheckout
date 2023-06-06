@@ -155,271 +155,328 @@ async function onLoaded() {
     // Create an instance of the headless checkout
     const headless = await Primer.createHeadless(clientToken)
 
-  // Configure headless
-  await headless.configure({
-    onAvailablePaymentMethodsLoad,
-    onCheckoutComplete,
-    onCheckoutFail
-  });
+// Configure headless
+await headless.configure({
+  onAvailablePaymentMethodsLoad(paymentMethods) {
+      // Called when the available payment methods are retrieved
 
-  async function onAvailablePaymentMethodsLoad(paymentMethodTypes) {
-    // Called when the available payment methods are retrieved
-    console.log("Available Payment Methods:", paymentMethodTypes);
+      for (const paymentMethod of paymentMethods) {
+          // `type` is a unique ID representing the payment method
+          const { type, managerType } = paymentMethod
 
-    for (const paymentMethodType of paymentMethodTypes) {
-      switch (paymentMethodType) {
-        case 'PAYMENT_CARD': {
-          //headless web UI config
-          const container = document.getElementById("checkout-container")
-
-          // Create containers for your hosted inputs
-          const cardNumberInputId = 'checkout-card-number-input'
-          const cardNumberInputEl = document.createElement('div')
-          cardNumberInputEl.setAttribute('id', cardNumberInputId)
-          cardNumberInputEl.setAttribute('class', 'card-input')
-
-
-          const cardExpiryInputId = 'checkout-card-expiry-input'
-          const cardExpiryInputEl = document.createElement('div')
-          cardExpiryInputEl.setAttribute('id', cardExpiryInputId)
-          cardExpiryInputEl.setAttribute("class", "card");
-
-          const cardCvvInputId = 'checkout-card-cvv-input'
-          const cardCvvInputEl = document.createElement('div')
-          cardCvvInputEl.setAttribute('id', cardCvvInputId)
-          cardCvvInputEl.setAttribute("class", "card");
-
-          const cardHolderInputId = 'primer-checkout-card-cardholder-name-input'
-          const cardHolderInputEl = document.createElement('input')
-          cardHolderInputEl.setAttribute('id', cardHolderInputId)
-          cardHolderInputEl.setAttribute('placeholder', 'Cardholder Name')
-          cardHolderInputEl.setAttribute("type", "text");
-
-          const submitButton = document.createElement('input')
-          const buttonId = 'submit-button'
-          submitButton.setAttribute('type', 'button')
-          submitButton.setAttribute('id', buttonId)
-          submitButton.setAttribute("class", "inputs");
-          submitButton.value = 'Submit'
-
-          // Add them to your container
-          container.append(cardNumberInputEl, cardExpiryInputEl, cardCvvInputEl, cardHolderInputEl, submitButton)
-
-          async function configureCardForm() {
-
-            const style = {
-              input: {
-                base: {
-                  height: "21px",
-                  boxShadow:
-                    "inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;",
-                  boxSizing: "border-box",
-                  fontSize: "11px",
-                  backgroundColor: "#fff",
-                  padding: "3px 4px",
-                  fontFamily: "Pixelated MS Sans Serif, Arial",
-                },
-              },
-            }
-
-            // Create the payment method manager
-            const cardManager = await headless.createPaymentMethodManager('PAYMENT_CARD', {
-              onCardMetadataChange({
-                type
-              }) {
-                console.log('Card type: ', type)
-              },
-            })
-
-            // Create the hosted inputs
-            const cardNumberInput = cardManager.createHostedInput('cardNumber')
-            const cvvInput = cardManager.createHostedInput('cvv')
-            const expiryInput = cardManager.createHostedInput('expiryDate')
-
-
-            await Promise.all([
-              cardNumberInput.render(cardNumberInputId, {
-                placeholder: '1234 1234 1234 1234',
-                ariaLabel: 'Card number',
-                style,
-              }),
-              expiryInput.render(cardExpiryInputId, {
-                placeholder: 'MM/YY',
-                ariaLabel: 'Expiry date',
-                style,
-              }),
-              cvvInput.render(cardCvvInputId, {
-                placeholder: '123',
-                ariaLabel: 'CVV',
-                style,
-              }),
-            ])
-
-            // Set the cardholder name if it changes
-            document.getElementById(cardHolderInputId).addEventListener('change', e => {
-              cardManager.setCardholderName(e.target.value)
-            })
-
-            // Configure event listeners for supported events
-            cardNumberInput.addEventListener('change', (...args) => {
-              console.log('cardNumberInput changed', ...args)
-            })
-
-            cardNumberInput.focus()
-
-            submitButton.addEventListener('click', async () => {
-              // Validate your card input data
-              const result = await cardManager.validate()
-              const { valid } = result;
-              console.log('Is it Valid?', valid, result)
-
-              if (valid) {
-                console.log('All is valid')
-
-                // Submit the card input data to Primer for tokenization
-                await cardManager.submit()
+          switch (managerType) {
+              case 'CARD': {
+                  // Configure your card form (see Step 4.a)
+                  // await configureCardForm(paymentMethod);
+                  break
               }
-            })
+              case 'NATIVE': {
+                  // Render the native payment method button (see Step 4.b)
+                  // Relevant for PayPal, Apple Pay and Google Pay
+                  // configureNativeButton(paymentMethod);
+                  break
+              }
+              case 'REDIRECT': {
+                  // Handle redirect payment methods (see Step 4.c)
+                  // configureRedirectPaymentMethod(paymentMethod);
+                  break
+              }
+
+              // More payment methods to follow
           }
-
-          await configureCardForm();
-
-          break;
-        }
-        case "PAYPAL": {
-          const container = document.getElementById("checkout-container");
-
-          const paymentMethodManager =
-            await headless.createPaymentMethodManager("PAYPAL"); // or APPLE_PAY / GOOGLE_PAY
-          // Create your button container
-          const payPalButton = document.createElement("div");
-          const payPalButtonId = "paypal-button";
-          payPalButton.setAttribute("type", "button");
-          payPalButton.setAttribute("id", payPalButtonId);
-          payPalButton.setAttribute("class", "apm-button");
-
-          container.append(payPalButton);
-
-          function configurePayPalButton() {
-            // Create the payment method manager
-            const button = paymentMethodManager.createButton();
-
-            // Render the button
-
-            button.render(payPalButtonId, {
-              style: {
-                buttonColor: "silver",
-              },
-            });
-          }
-
-          configurePayPalButton();
-          break;
-        }
-        case "APPLE_PAY": {
-          const container = document.getElementById("checkout-container");
-
-          const paymentMethodManager =
-            await headless.createPaymentMethodManager("APPLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
-          // Create your button container
-          const applePayButton = document.createElement("div");
-          const applePayButtonId = "apple-pay-button";
-          applePayButton.setAttribute("type", "button");
-          applePayButton.setAttribute("id", applePayButtonId);
-          applePayButton.setAttribute("class", "apm-button");
-
-          container.append(applePayButton);
-
-          function configureApplePayButton() {
-            // Create the payment method manager
-            const button = paymentMethodManager.createButton();
-
-            // Render the button
-
-            button.render(applePayButton, {
-              style: {
-                buttonColor: "white",
-              },
-            });
-          }
-
-          configureApplePayButton();
-
-          break;
-        }
-        case "GOOGLE_PAY": {
-          const container = document.getElementById("checkout-container");
-
-          const paymentMethodManager =
-            await headless.createPaymentMethodManager("GOOGLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
-          // Create your button container
-          const googlePayButton = document.createElement("div");
-          const googlePayId = "google-pay-button";
-          googlePayButton.setAttribute("type", "button");
-          googlePayButton.setAttribute("id", googlePayId);
-          googlePayButton.setAttribute("class", "apm-button");
-
-          container.append(googlePayButton);
-
-          function configureGooglePayButton() {
-            // Create the payment method manager
-            const button = paymentMethodManager.createButton();
-
-            // Render the button
-
-            button.render(googlePayId, {
-              style: {
-                buttonColor: "white",
-              },
-            });
-          }
-
-          configureGooglePayButton();
-
-          break;
-        }
-
-
-
       }
-    }
-  }
-
-  function onCheckoutComplete({
-    payment
-  }) {
+  },
+  onCheckoutComplete({ payment }) {
     // Notifies you that a payment was created
     // Move on to next step in your checkout flow:
     // e.g. Show a success message, giving access to the service, fulfilling the order, ...
     console.log('onCheckoutComplete', payment)
+},
 
-  }
-
-  function onCheckoutFail(error, {
-    payment
-  }, handler) {
+onCheckoutFail(error, { payment }, handler) {
     // Notifies you that the checkout flow has failed and a payment could not be created
     // This callback can also be used to display an error state within your own UI.
 
     // ⚠️ `handler` is undefined if the SDK does not expect anything from you
     if (!handler) {
-      return
+        return
     }
 
     // ⚠️ If `handler` exists, you MUST call one of the functions of the handler
 
     // Show a default error message
     return handler.showErrorMessage()
-  }
+},
+})
+
+await headless.start()
+
+console.log('Headless Universal Checkout is loaded!')
+
+}
+
+
+
+
+
+
+
+
+
+  // async function onAvailablePaymentMethodsLoad(paymentMethodTypes) {
+  //   // Called when the available payment methods are retrieved
+  //   console.log("Available Payment Methods:", paymentMethodTypes);
+
+  //   for (const paymentMethodType of paymentMethodTypes) {
+  //     switch (paymentMethodType) {
+  //       case 'PAYMENT_CARD': {
+  //         //headless web UI config
+  //         const container = document.getElementById("checkout-container")
+
+  //         // Create containers for your hosted inputs
+  //         const cardNumberInputId = 'checkout-card-number-input'
+  //         const cardNumberInputEl = document.createElement('div')
+  //         cardNumberInputEl.setAttribute('id', cardNumberInputId)
+  //         cardNumberInputEl.setAttribute('class', 'card-input')
+
+
+  //         const cardExpiryInputId = 'checkout-card-expiry-input'
+  //         const cardExpiryInputEl = document.createElement('div')
+  //         cardExpiryInputEl.setAttribute('id', cardExpiryInputId)
+  //         cardExpiryInputEl.setAttribute("class", "card");
+
+  //         const cardCvvInputId = 'checkout-card-cvv-input'
+  //         const cardCvvInputEl = document.createElement('div')
+  //         cardCvvInputEl.setAttribute('id', cardCvvInputId)
+  //         cardCvvInputEl.setAttribute("class", "card");
+
+  //         const cardHolderInputId = 'primer-checkout-card-cardholder-name-input'
+  //         const cardHolderInputEl = document.createElement('input')
+  //         cardHolderInputEl.setAttribute('id', cardHolderInputId)
+  //         cardHolderInputEl.setAttribute('placeholder', 'Cardholder Name')
+  //         cardHolderInputEl.setAttribute("type", "text");
+
+  //         const submitButton = document.createElement('input')
+  //         const buttonId = 'submit-button'
+  //         submitButton.setAttribute('type', 'button')
+  //         submitButton.setAttribute('id', buttonId)
+  //         submitButton.setAttribute("class", "inputs");
+  //         submitButton.value = 'Submit'
+
+  //         // Add them to your container
+  //         container.append(cardNumberInputEl, cardExpiryInputEl, cardCvvInputEl, cardHolderInputEl, submitButton)
+
+  //         async function configureCardForm() {
+
+  //           const style = {
+  //             input: {
+  //               base: {
+  //                 height: "21px",
+  //                 boxShadow:
+  //                   "inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;",
+  //                 boxSizing: "border-box",
+  //                 fontSize: "11px",
+  //                 backgroundColor: "#fff",
+  //                 padding: "3px 4px",
+  //                 fontFamily: "Pixelated MS Sans Serif, Arial",
+  //               },
+  //             },
+  //           }
+
+  //           // Create the payment method manager
+  //           const cardManager = await headless.createPaymentMethodManager('PAYMENT_CARD', {
+  //             onCardMetadataChange({
+  //               type
+  //             }) {
+  //               console.log('Card type: ', type)
+  //             },
+  //           })
+
+  //           // Create the hosted inputs
+  //           const cardNumberInput = cardManager.createHostedInput('cardNumber')
+  //           const cvvInput = cardManager.createHostedInput('cvv')
+  //           const expiryInput = cardManager.createHostedInput('expiryDate')
+
+
+  //           await Promise.all([
+  //             cardNumberInput.render(cardNumberInputId, {
+  //               placeholder: '1234 1234 1234 1234',
+  //               ariaLabel: 'Card number',
+  //               style,
+  //             }),
+  //             expiryInput.render(cardExpiryInputId, {
+  //               placeholder: 'MM/YY',
+  //               ariaLabel: 'Expiry date',
+  //               style,
+  //             }),
+  //             cvvInput.render(cardCvvInputId, {
+  //               placeholder: '123',
+  //               ariaLabel: 'CVV',
+  //               style,
+  //             }),
+  //           ])
+
+  //           // Set the cardholder name if it changes
+  //           document.getElementById(cardHolderInputId).addEventListener('change', e => {
+  //             cardManager.setCardholderName(e.target.value)
+  //           })
+
+  //           // Configure event listeners for supported events
+  //           cardNumberInput.addEventListener('change', (...args) => {
+  //             console.log('cardNumberInput changed', ...args)
+  //           })
+
+  //           cardNumberInput.focus()
+
+  //           submitButton.addEventListener('click', async () => {
+  //             // Validate your card input data
+  //             const result = await cardManager.validate()
+  //             const { valid } = result;
+  //             console.log('Is it Valid?', valid, result)
+
+  //             if (valid) {
+  //               console.log('All is valid')
+
+  //               // Submit the card input data to Primer for tokenization
+  //               await cardManager.submit()
+  //             }
+  //           })
+  //         }
+
+  //         await configureCardForm();
+
+  //         break;
+  //       }
+  //       case "PAYPAL": {
+  //         const container = document.getElementById("checkout-container");
+
+  //         const paymentMethodManager =
+  //           await headless.createPaymentMethodManager("PAYPAL"); // or APPLE_PAY / GOOGLE_PAY
+  //         // Create your button container
+  //         const payPalButton = document.createElement("div");
+  //         const payPalButtonId = "paypal-button";
+  //         payPalButton.setAttribute("type", "button");
+  //         payPalButton.setAttribute("id", payPalButtonId);
+  //         payPalButton.setAttribute("class", "apm-button");
+
+  //         container.append(payPalButton);
+
+  //         function configurePayPalButton() {
+  //           // Create the payment method manager
+  //           const button = paymentMethodManager.createButton();
+
+  //           // Render the button
+
+  //           button.render(payPalButtonId, {
+  //             style: {
+  //               buttonColor: "silver",
+  //             },
+  //           });
+  //         }
+
+  //         configurePayPalButton();
+  //         break;
+  //       }
+  //       case "APPLE_PAY": {
+  //         const container = document.getElementById("checkout-container");
+
+  //         const paymentMethodManager =
+  //           await headless.createPaymentMethodManager("APPLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
+  //         // Create your button container
+  //         const applePayButton = document.createElement("div");
+  //         const applePayButtonId = "apple-pay-button";
+  //         applePayButton.setAttribute("type", "button");
+  //         applePayButton.setAttribute("id", applePayButtonId);
+  //         applePayButton.setAttribute("class", "apm-button");
+
+  //         container.append(applePayButton);
+
+  //         function configureApplePayButton() {
+  //           // Create the payment method manager
+  //           const button = paymentMethodManager.createButton();
+
+  //           // Render the button
+
+  //           button.render(applePayButton, {
+  //             style: {
+  //               buttonColor: "white",
+  //             },
+  //           });
+  //         }
+
+  //         configureApplePayButton();
+
+  //         break;
+  //       }
+  //       case "GOOGLE_PAY": {
+  //         const container = document.getElementById("checkout-container");
+
+  //         const paymentMethodManager =
+  //           await headless.createPaymentMethodManager("GOOGLE_PAY"); // or APPLE_PAY / GOOGLE_PAY
+  //         // Create your button container
+  //         const googlePayButton = document.createElement("div");
+  //         const googlePayId = "google-pay-button";
+  //         googlePayButton.setAttribute("type", "button");
+  //         googlePayButton.setAttribute("id", googlePayId);
+  //         googlePayButton.setAttribute("class", "apm-button");
+
+  //         container.append(googlePayButton);
+
+  //         function configureGooglePayButton() {
+  //           // Create the payment method manager
+  //           const button = paymentMethodManager.createButton();
+
+  //           // Render the button
+
+  //           button.render(googlePayId, {
+  //             style: {
+  //               buttonColor: "white",
+  //             },
+  //           });
+  //         }
+
+  //         configureGooglePayButton();
+
+  //         break;
+  //       }
+
+
+
+  //     }
+  //   }
+  // }
+
+  // function onCheckoutComplete({
+  //   payment
+  // }) {
+  //   // Notifies you that a payment was created
+  //   // Move on to next step in your checkout flow:
+  //   // e.g. Show a success message, giving access to the service, fulfilling the order, ...
+  //   console.log('onCheckoutComplete', payment)
+
+  // }
+
+  // function onCheckoutFail(error, {
+  //   payment
+  // }, handler) {
+  //   // Notifies you that the checkout flow has failed and a payment could not be created
+  //   // This callback can also be used to display an error state within your own UI.
+
+  //   // ⚠️ `handler` is undefined if the SDK does not expect anything from you
+  //   if (!handler) {
+  //     return
+  //   }
+
+    // ⚠️ If `handler` exists, you MUST call one of the functions of the handler
+
+    // Show a default error message
+ //   return handler.showErrorMessage()
+//  }
 
 
 
   // Start the headless checkout
-  await headless.start()
 
-  console.log('Headless Universal Checkout is loaded!')
-
-  }
 
 
 
