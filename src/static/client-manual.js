@@ -6,6 +6,9 @@ async function onLoaded() {
   const autofillFormButton = document.getElementById("autofill-button");
   const quantity = document.getElementById("quantity");
   const size = document.getElementById("size");
+  const amount = document.getElementById("amount");
+  const currency = document.getElementById("currency");
+
 
   const customerDetails = {
     firstName: document.getElementById("first-name"),
@@ -26,10 +29,12 @@ async function onLoaded() {
   const autofillForm = () => {
     quantity.value = 1;
     size.value = "l";
+    amount.value = "10000";
+    currency.value = "GBP";
     customerDetails.firstName.value = "Alberto";
     customerDetails.lastName.value = "DeRonzi";
-    customerDetails.emailAddress.value = "test@primer.io";
-    customerDetails.mobileNumber.value = "+447532172666";
+    customerDetails.emailAddress.value = "approve@forter.com";
+    customerDetails.mobileNumber.value = "07538690994";
     billingAddress.addressLine1.value = "1 King Street";
     billingAddress.addressLine2.value = "2 Floor";
     billingAddress.city.value = "London";
@@ -48,11 +53,15 @@ async function onLoaded() {
   };
 
 
-  const getOrderInfo = (currency) => {
+  const getOrderInfo = () => {
+    console.log("amount", amount.value);
+    console.log("currency", currency.value);
+
     return {
-      customerId: "albertoanthony2",
+      customerId: "alberto",
       orderId: `${Math.random().toString(36).substring(7)}`,
-      currencyCode: currency || "GBP",
+      currencyCode: currency.value,
+      amount:parseInt(amount.value),
       order: {
         lineItems: [
           {
@@ -60,7 +69,7 @@ async function onLoaded() {
             name: `${quantity.value} Lego${quantity.value > 1 ? "s" : ""
               } - ${size.value.toUpperCase()}`,
             description: `${quantity.value} ${size.value.toUpperCase()} Lego`,
-            amount: 1234 * quantity.value,
+            amount: amount.value * quantity.value,
             productType: "PHYSICAL",
           },
         ],
@@ -81,11 +90,40 @@ async function onLoaded() {
         },
       },
       metadata: {
-     //  workflow: "3ds_braintree",
-        v1: true
-     // paypal_client_metadata_id: "6056a4e0dccf603087c289e9301cc1",
-      //custom_id: "repay-6056a4e0dccf603087c289e9301cab",
-       },
+        force_3ds: true,
+       // sensor:"Stripe",
+    //workflow: "alipay",
+     //  workflow: "adyen",
+      workflow: "braintree",
+      flow:"manual",
+      // primer_credit_card:"checkout",
+
+      // emd:{
+      //     "content_type": "application/vnd.klarna.internal.emd-v2+json",
+      //     "body": "{string value containing a serialized JSON object}"
+      //     },
+     // actionList: "DECISION_SKIP",
+      // v1: true,
+        fraud_check: false,
+       fraud_context: {
+       // deliveryMethod:"deliveryMethod_fraudcontext_test",
+        device_details: {
+            user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/112.0",
+            device_id: "string",
+            browser_ip: "1.2.3.4",
+            cookie_token: "test_cookie"
+        },  
+          merchant_details: {
+          merchant_provider_id: "id-123",
+          merchant_name: "merchant-name",
+          merchant_category_code: "4414"
+        }
+      }
+      // webapp: true
+     //paypal_client_metadata_id: "6056a4e0dccf603087c289e9301cc1",
+    // custom_id: "repay-6056a4e0dccf603087c289e9301cab",
+    //primer_credit_card: "checkout"
+          },
 
        paymentMethod: {
         // paymentType: "UNSCHEDULED",
@@ -108,7 +146,7 @@ async function onLoaded() {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
-        'Legacy-workflows' : 'true'
+        'Legacy-workflows' : true
 
       },
       body: JSON.stringify({
@@ -162,12 +200,15 @@ async function onLoaded() {
     const options ={
       container: '#checkout-container',
       paymentHandling: 'MANUAL',
-      paypal: {
-        paymentFlow: "PREFER_VAULT"
-      },
-      redirect: {
-        returnUrl: 'http://localhost:8880/',
-    },
+      locale: 'en',
+    //   paypal: {
+    //     paymentFlow: "PREFER_VAULT"
+    //   },
+    // //   redirect: {
+    //     returnUrl: 'http://localhost:8880/',
+    //     forceRedirect: true,
+
+    // },
     style: {
         /* Style options */
     },
@@ -181,14 +222,16 @@ async function onLoaded() {
       const customerId = getOrderInfo().customerId
       const orderId = getOrderInfo().orderId
       const currencyCode = getOrderInfo().currencyCode
-      const amount = getOrderInfo().order.lineItems[0].amount
+      //const amount = getOrderInfo().order.lineItems[0].amount
+      const amount = getOrderInfo.amount
+     //const amount = 4321
       console.log("before create payment");
 
       const response = await fetch('/create-payment', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
-          'Legacy-workflows' : 'false'
+          'Legacy-workflows' : false
 
         },
         body: JSON.stringify({
@@ -210,6 +253,8 @@ async function onLoaded() {
       // If a new clientToken is available, call `handler.continueWithNewClientToken` to refresh the client session.
       // The checkout will automatically perform the action required by the Workflow.
       if (response.requiredAction) {
+        console.log("in tokenise Success", response.requiredAction.clientToken);
+
         return handler.continueWithNewClientToken(response.requiredAction.clientToken)
       }
 
@@ -236,11 +281,13 @@ async function onLoaded() {
     async onResumeSuccess(resumeTokenData, handler) {
       // Send the resume token to your server to resume the payment
       //  const response = await resumePayment(resumeTokenData.resumeToken)
+      console.log("On Resume SUCCESS:");
+      console.log(resumeTokenData);
       const response = await fetch('/resume', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
-          'Legacy-workflows' : 'false'
+          'Legacy-workflows' : false
 
         },
         body: JSON.stringify({ 'resumeToken': resumeTokenData.resumeToken })
@@ -273,6 +320,12 @@ async function onLoaded() {
       return handler.handleSuccess()
     },
 
+    onPaymentCreationStart()
+    {
+      console.log('OnPaymentCreationStart')
+
+    },
+
     onPaymentMethodAction(paymentMethodAction, data)
     {
       console.log('OnPaymentAction', data)
@@ -302,14 +355,14 @@ async function onLoaded() {
     //   method: 'PATCH',
     //   headers: {
     //     'Content-Type': 'application/json'},
-    //    body: JSON.stringify({ clientToken: clientToken, amount: 14321})
-    //
+    //    body: JSON.stringify({ clientToken: clientToken, amount: 4321})
+    
     // })
     // console.log(response2);
     //   console.log(clientToken);
-    const isUpdated = await universalCheckout.setClientToken(clientToken);
+    // const isUpdated = await universalCheckout.setClientToken(clientToken);
 
-    console.log("Is updated?", isUpdated) // true
+    // console.log("Is updated?", isUpdated) // true
 
 
 

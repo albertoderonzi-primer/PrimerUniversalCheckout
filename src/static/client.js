@@ -6,6 +6,10 @@ async function onLoaded() {
   const autofillFormButton = document.getElementById("autofill-button");
   const quantity = document.getElementById("quantity");
   const size = document.getElementById("size");
+  const amount = document.getElementById("amount");
+  const currency = document.getElementById("currency");
+
+
 
   const customerDetails = {
     firstName: document.getElementById("first-name"),
@@ -26,15 +30,17 @@ async function onLoaded() {
   const autofillForm = () => {
     quantity.value = 1;
     size.value = "l";
+    amount.value = "10000";
+    currency.value = "GBP";
     customerDetails.firstName.value = "Alberto";
     customerDetails.lastName.value = "DeRonzi";
-    customerDetails.emailAddress.value = "test@primer.io";
-    customerDetails.mobileNumber.value = "+447532172666";
+    customerDetails.emailAddress.value = "approve@forter.com";
+    customerDetails.mobileNumber.value = "+4407538690994";
     billingAddress.addressLine1.value = "1 King Street";
     billingAddress.addressLine2.value = "2 Floor";
     billingAddress.city.value = "London";
     billingAddress.state.value = "GB";
-    billingAddress.postalCode.value = "SE10";
+    billingAddress.postalCode.value = "SE10 8CC";
     billingAddress.country.value = "GB";
   };
 
@@ -48,17 +54,19 @@ async function onLoaded() {
   };
 
 
-  const getOrderInfo = (currency) => {
+  const getOrderInfo = () => {
     return {
-      customerId: "alberto_test",
-      orderId: `${Math.random().toString(36).substring(7)}`,
-      currencyCode: currency || "GBP",
+      customerId: "alberto",
+    //  orderId: `${Math.random().toString(36).substring(7)}`,
+    orderId: "HYalberto",
+    amount:parseInt(amount.value),
+    currencyCode: currency.value,
       order: {
         shipping: 
       {
         amount:0,
-        methodName: "test",
-        methodId: "testID"
+        methodName: "methodName_test",
+    //    methodId: "methodId_test"
       },
         lineItems: [
           {
@@ -66,7 +74,15 @@ async function onLoaded() {
             name: `${quantity.value} Lego${quantity.value > 1 ? "s" : ""
               } - ${size.value.toUpperCase()}`,
             description: `${quantity.value} ${size.value.toUpperCase()} Lego`,
-            amount: 5100 * quantity.value,
+            amount: amount.value * quantity.value/2,
+            productType: "DIGITAL",
+          },
+          {
+            itemId: `item-${size.value}`,
+            name: `${quantity.value} Lego${quantity.value > 1 ? "P" : ""
+              } - ${size.value.toUpperCase()}`,
+            description: `${quantity.value} ${size.value.toUpperCase()} LegoP`,
+            amount: amount.value * quantity.value/2,
             productType: "PHYSICAL",
           },
         ],
@@ -78,42 +94,60 @@ async function onLoaded() {
         emailAddress: customerDetails.emailAddress.value,
         mobileNumber: customerDetails.mobileNumber.value,
         billingAddress: {
-          addressLine1: billingAddress.addressLine1.value,
-          addressLine2: billingAddress.addressLine2.value,
-          city: billingAddress.city.value,
-          state: billingAddress.state.value,
+          firstName: customerDetails.firstName.value,
+          lastName: customerDetails.lastName.value,
           postalCode: billingAddress.postalCode.value,
+          addressLine1: billingAddress.addressLine1.value,
+    //      addressLine2: billingAddress.addressLine2.value,
           countryCode: billingAddress.country.value,
+          city: billingAddress.city.value,
+       //   state: billingAddress.state.value,
+       //   phone: customerDetails.mobileNumber.value,
         },
    //     nationalDocumentId: "12345678",
       },
       metadata: {
-      // workflow: "braintree",
-     // workflow: "stripe",
+        force_3ds: true,
+        description:"Test Description",
+       // sensor:"Stripe",
+      workflow: "cybersource",
+     // workflow:"adyen",
+       //workflow: "forter-testing",
+       // workflow: "3ds_braintree",
+      // workflow:"sift",
       // primer_credit_card:"checkout",
-      //   v1: true,
+
       // emd:{
       //     "content_type": "application/vnd.klarna.internal.emd-v2+json",
       //     "body": "{string value containing a serialized JSON object}"
       //     },
-       fraud_check: true,
+      actionList: "DECISION_SKIP",
+      // v1: true,
+        fraud_check: true,
        fraud_context: {
-        deliveryMethod:"test",
+       // deliveryMethod:"deliveryMethod_fraudcontext_test",
         device_details: {
             user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/112.0",
             device_id: "string",
-            browser_ip: "1.2.3.4"
+            browser_ip: "1.2.3.4",
+            cookie_token: "test_cookie",
+            source:"WEB"
+        },  
+          merchant_details: {
+          merchant_provider_id: "id-123",
+          merchant_name: "merchant-name",
+          merchant_category_code: "4414"
         }
       }
       // webapp: true
-      
      //paypal_client_metadata_id: "6056a4e0dccf603087c289e9301cc1",
     // custom_id: "repay-6056a4e0dccf603087c289e9301cab",
     //primer_credit_card: "checkout"
           },
       paymentMethod: {
       //  paymentType: "ECOMMERCE",
-    //    vaultOnSuccess: true,
+     // paymentType: "FIRST_PAYMENT",
+      vaultOnSuccess: true,
       //  vaultOn3DS: false,
         descriptor:"test"
 
@@ -193,11 +227,21 @@ async function onLoaded() {
     const options ={
       container: '#checkout-container',
       locale: 'en',
+      // uxFlow: "SINGLE_PAYMENT_METHOD_CHECKOUT",
+      // paymentMethod: "KLARNA",
+   //   allowedCardNetworks: ['visa', 'american-express', 'mastercard'],
+  // allowedPaymentMethods: ['PAYMENT_CARD','KLARNA'],
 
 submitButton:{
   useBuiltInButton: true, // Hide the built-in submit button
 
 },
+
+// klarna: {
+
+//   allowedPaymentCategories: "klarna",
+
+// },
 
       //  paypal: {
       //    paymentFlow: "PREFER_VAULT"
@@ -207,7 +251,8 @@ submitButton:{
       },
       googlePay: {
         captureBillingAddress: true,
-        buttonType: 'plain',
+   //     buttonType: 'plain',
+    //  locale:'it',
       },
 
       onCheckoutFail(error, { payment }, handler) {
@@ -215,11 +260,15 @@ submitButton:{
         handler.showErrorMessage("Nice Customised Frontend error")
     },
 
-    
+    onPaymentCreationStart()
+    {
+      console.log('OnPaymentCreationStart')
 
+    },
+    
     onPaymentMethodAction(paymentMethodAction, data)
     {
-      console.log('OnPaymentAction', data)
+      console.log('OnPaymentAction', paymentMethodAction, data)
 
     },
 
@@ -236,30 +285,29 @@ submitButton:{
     }
 
      const universalCheckout = await Primer.showUniversalCheckout(clientToken,options, {
-    //const universalCheckout = await Primer.showVaultManager(clientToken,options, {
+    // //const universalCheckout = await Primer.showVaultManager(clientToken,options, {
 
 
-      // Specify the selector of the container element
+    //   // Specify the selector of the container element
 
-      /**
-       * When the checkout flow has been completed, you'll receive
-       * the successful payment via `onCheckoutComplete`.
-       * Implement this callback to redirect the user to an order confirmation page and fulfill the order.
-       */
-      // onCheckoutComplete({ payment }) {
-      //   console.log('Checkout Complete!', payment)
-      // },
+    //   /**
+    //    * When the checkout flow has been completed, you'll receive
+    //    * the successful payment via `onCheckoutComplete`.
+    //    * Implement this callback to redirect the user to an order confirmation page and fulfill the order.
+    //    */
+    //   // onCheckoutComplete({ payment }) {
+    //   //   console.log('Checkout Complete!', payment)
+    //   // },
 
-    //   onCheckoutFail(error, { payment }, handler) {
-    //     console.log('Checkout Fail!', error, payment)
-    // },
-      /**
-       * Learn more about the other options at:
-       * https://primer.io/docs
-       * https://www.npmjs.com/package/@primer-io/checkout-web
-       */
-    }
-
+    // //   onCheckoutFail(error, { payment }, handler) {
+    // //     console.log('Checkout Fail!', error, payment)
+    // // },
+    //   /**
+    //    * Learn more about the other options at:
+    //    * https://primer.io/docs
+    //    * https://www.npmjs.com/package/@primer-io/checkout-web
+    //    */
+     }
 
     )
 

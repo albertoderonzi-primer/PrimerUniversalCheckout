@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="stylesheet" href="/static/checkout-style.css" />
-  <link rel="stylesheet" href="https://sdk.primer.io/web/v2.31.0/Checkout.css" />
-  <script src="https://sdk.primer.io/web/v2.31.0/Primer.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://sdk.primer.io/web/v2.32.2/Checkout.css" />
+  <script src="https://sdk.primer.io/web/v2.32.2/Primer.min.js" crossorigin="anonymous"></script>
 
   <!-- <link rel="stylesheet" href="https://sdk.primer.io/web/v2-latest/Checkout.css" />
   <script src="https://sdk.primer.io/web/v2-latest/Primer.min.js" crossorigin="anonymous"></script> -->
@@ -30,6 +30,8 @@
         <div id="shirt-purchase-form">
           <p class="heading">Take it home for 100£</p>
           <input type="number" name="quantity" id="quantity" placeholder=" Quantity" min="1" class="inputs" />
+          <input type="number" name="amount" id="amount" placeholder=" Amount" min="1" class="inputs" />
+          <input type="text" name="currency" id="currency" placeholder=" Currency" class="inputs" />
 
           <select name="size" id="size" class="inputs">
             <option value="s">Small</option>

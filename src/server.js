@@ -69,15 +69,22 @@ app.post('/client-session', async (req, res) => {
   const response = await fetch(url, {
     method: 'post',
     headers: {
+      Accept: 'application/json',
       'Content-Type': 'application/json',
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
-      'Legacy-workflows' :LEGACY_WORKFLOW
+      'Legacy-workflows': LEGACY_WORKFLOW,
+   //'Legacy-workflows' : false,
+
     },
     body: JSON.stringify(requestBody),
 }).then(data => data.json());
 
-  console.log("S - Create Session API: Response", response);
+  console.log("S - Create Session API: Response",response);
+  if (response.error){
+    console.log("S - Create Session API: Response error", JSON.stringify(response.error.validationErrors));
+  }
+
   return res.send(response);
 });
 
@@ -101,6 +108,7 @@ app.post('/create-payment', async (req, res) => {
       'X-Api-Key': API_KEY,
       'X-Idempotency-Key': '1112' + Math.random(),
       'Legacy-workflows' :LEGACY_WORKFLOW
+    //'Legacy-workflows' : true
 
     },
 
@@ -132,6 +140,8 @@ app.post('/resume', async (req, res) => {
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
       'Legacy-workflows' :LEGACY_WORKFLOW
+     //'Legacy-workflows' : true
+
 
     },
 
