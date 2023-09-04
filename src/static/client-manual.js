@@ -54,8 +54,8 @@ async function onLoaded() {
 
 
   const getOrderInfo = () => {
-    console.log("amount", amount.value);
-    console.log("currency", currency.value);
+  //  console.log("amount", amount.value);
+  //  console.log("currency", currency.value);
 
     return {
       customerId: "alberto",
@@ -204,11 +204,11 @@ async function onLoaded() {
     //   paypal: {
     //     paymentFlow: "PREFER_VAULT"
     //   },
-    // //   redirect: {
-    //     returnUrl: 'http://localhost:8880/',
-    //     forceRedirect: true,
+      redirect: {
+        returnUrl: 'http://localhost:8880/',
+        forceRedirect: truex,
 
-    // },
+   },
     style: {
         /* Style options */
     },
@@ -326,12 +326,26 @@ async function onLoaded() {
 
     },
 
+    // onTokenizeShouldStart(data)
+
+    // {
+    //   console.log('onTokenizeShouldStart', data)
+    //   return handler.continuePaymentCreation()
+    // },
+
+
+    onBeforePaymentCreate(data,handler)
+    {
+      console.log('onBeforePaymentCreate', data)
+      return handler.continuePaymentCreation()
+    },
+
     onPaymentMethodAction(paymentMethodAction, data)
     {
       console.log('OnPaymentAction', data)
 
     },
-    
+
     handleonPaymentMethodAction(paymentMethodAction, data)
     {
       console.log('Handle_OnPaymentAction', data)
