@@ -62,7 +62,8 @@ app.post('/client-session', async (req, res) => {
   // If the order details are not passed from the front end, get the info from hardcoded data in the backend.
   if (!requestBody) {
     console.log("S - Requestiing order info");
-    requestBody = getOrderInfo() }
+    requestBody = getOrderInfo()
+  }
 
   console.log("S - Request Body:", requestBody);
 
@@ -74,14 +75,14 @@ app.post('/client-session', async (req, res) => {
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
       'Legacy-workflows': LEGACY_WORKFLOW,
-   //'Legacy-workflows' : false,
+      //'Legacy-workflows' : false,
 
     },
     body: JSON.stringify(requestBody),
-}).then(data => data.json());
+  }).then(data => data.json());
 
-  console.log("S - Create Session API: Response",response);
-  if (response.error){
+  console.log("S - Create Session API: Response", response);
+  if (response.error) {
     console.log("S - Create Session API: Response error", JSON.stringify(response.error.validationErrors));
   }
 
@@ -107,8 +108,8 @@ app.post('/create-payment', async (req, res) => {
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
       'X-Idempotency-Key': '1112' + Math.random(),
-      'Legacy-workflows' :LEGACY_WORKFLOW
-    //'Legacy-workflows' : true
+      'Legacy-workflows': LEGACY_WORKFLOW
+      //'Legacy-workflows' : true
 
     },
 
@@ -132,15 +133,15 @@ app.post('/resume', async (req, res) => {
   console.log(req.body);
 
   const api_body = req.body;
-//TODO add check on response
+  //TODO add check on response
   const response = await fetch(url, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
       'X-Api-Version': API_VERSION,
       'X-Api-Key': API_KEY,
-      'Legacy-workflows' :LEGACY_WORKFLOW
-     //'Legacy-workflows' : true
+      'Legacy-workflows': LEGACY_WORKFLOW
+      //'Legacy-workflows' : true
 
 
     },
