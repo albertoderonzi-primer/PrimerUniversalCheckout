@@ -113,6 +113,7 @@ async function onLoaded() {
         nationalDocumentId: "12345678",
       },
       metadata: {
+       klarna_flow:"old_flow",
         //  force_3ds: true,
         // regionCountryCode: "GB",
         description: "Test Description",
@@ -351,6 +352,15 @@ async function onLoaded() {
               configureRedirectPaymentMethod(headless, paymentMethod);
               break;
             }
+            case "KLARNA": {
+              // Handle redirect payment methods (see Step 4.c)
+              console.log(
+                "Configuring " +
+                paymentMethod.type /*Payment Methods..."*/
+              );
+              configureKlarnaPaymentMethodManager(headless, paymentMethod);
+              break;
+            }
             // More payment methods to follow
           }
         }
@@ -465,7 +475,8 @@ async function configureCardForm(headless, paymentMethod) {
       placeholder: 'MM/YY',
       ariaLabel: 'Expiry date',
       style
-    }),
+    })
+    ,
     cvvInput.render(cardCvvInputId, {
       placeholder: '123',
       ariaLabel: 'CVV',
@@ -552,4 +563,21 @@ async function configureRedirectPaymentMethod(headless, paymentMethod) {
   // For this example, I'm appending it directly to the body.
   // You can append it to a specific container if you have one.
   document.body.appendChild(myButton);
+}
+
+/////////////////////////////////////
+////                             ////
+////  Klarna Payment Method      ////
+////                             ////
+/////////////////////////////////////
+
+async function configureKlarnaPaymentMethodManager(headless, paymentMethod){
+  const paymentMethodManager = await headless.createPaymentMethodManager(
+      type = "KLARNA",
+      {
+      onPaymentMethodCategoriesChange:(categories= KlarnaPaymentMethodCategory[pay_later]) =>{
+          renderCustomComponent(categories)
+      },
+      },
+  );
 }

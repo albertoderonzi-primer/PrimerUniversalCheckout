@@ -32,14 +32,14 @@ async function onLoaded() {
     amount.value = "10000";
     currency.value = "GBP";
     customerDetails.firstName.value = "Alberto";
-    customerDetails.lastName.value = "DeRonzi";
-    customerDetails.emailAddress.value = "approve@forter.com";
-    customerDetails.mobileNumber.value = "07538690994";
-    billingAddress.addressLine1.value = "1 King Street";
-    billingAddress.addressLine2.value = "2 Floor";
+    customerDetails.lastName.value = "De Ronzi";
+    customerDetails.emailAddress.value = "albey87@gmail.com";
+    customerDetails.mobileNumber.value = "07538 690994";
+    billingAddress.addressLine1.value = "10 Blissett Street";
+    billingAddress.addressLine2.value = " ";
     billingAddress.city.value = "London";
-    billingAddress.state.value = "GB";
-    billingAddress.postalCode.value = "SE10";
+    billingAddress.state.value = "  ";
+    billingAddress.postalCode.value = "SE10 8UP";
     billingAddress.country.value = "GB";
   };
 
@@ -58,7 +58,7 @@ async function onLoaded() {
   //  console.log("currency", currency.value);
 
     return {
-      customerId: "alberto",
+      customerId: "alberto_token",
       orderId: `${Math.random().toString(36).substring(7)}`,
       currencyCode: currency.value,
       amount:parseInt(amount.value),
@@ -79,12 +79,14 @@ async function onLoaded() {
         firstName: customerDetails.firstName.value,
         lastName: customerDetails.lastName.value,
         emailAddress: customerDetails.emailAddress.value,
-        mobileNumber: customerDetails.mobileNumber.value,
+       mobileNumber: customerDetails.mobileNumber.value,
         billingAddress: {
+          firstName: customerDetails.firstName.value,
+          lastName: customerDetails.lastName.value,
           addressLine1: billingAddress.addressLine1.value,
-          addressLine2: billingAddress.addressLine2.value,
+         // addressLine2: billingAddress.addressLine2.value,
           city: billingAddress.city.value,
-          state: billingAddress.state.value,
+       //   state: billingAddress.state.value,
           postalCode: billingAddress.postalCode.value,
           countryCode: billingAddress.country.value,
         },
@@ -93,8 +95,15 @@ async function onLoaded() {
         force_3ds: true,
        // sensor:"Stripe",
     //workflow: "alipay",
-     //  workflow: "adyen",
-      workflow: "braintree",
+      // workflow: "adyen",
+    // workflow: "primer",
+      workflow: "3ds_braintree",
+     // workflow: "3ds3ds",
+
+    // workflow: "perform_3ds",
+     // workflow: "test_fallback",
+
+
       flow:"manual",
       // primer_credit_card:"checkout",
 
@@ -126,7 +135,7 @@ async function onLoaded() {
           },
 
        paymentMethod: {
-        // paymentType: "UNSCHEDULED",
+        paymentType: "FIRST_PAYMENT",
          vaultOnSuccess: true,
          descriptor:"test"
      },
@@ -146,7 +155,7 @@ async function onLoaded() {
       method: 'post',
       headers: {
         'Content-Type': 'application/json',
-        'Legacy-workflows' : true
+        'Legacy-workflows' : false
 
       },
       body: JSON.stringify({
@@ -206,7 +215,7 @@ async function onLoaded() {
     //   },
       redirect: {
         returnUrl: 'http://localhost:8880/',
-        forceRedirect: truex,
+        forceRedirect: false,
 
    },
     style: {
@@ -226,12 +235,14 @@ async function onLoaded() {
       const amount = getOrderInfo.amount
      //const amount = 4321
       console.log("before create payment");
+      console.log("OnTokenizeSuccess paymentMethodTokenDatat",paymentMethodTokenData);
+
 
       const response = await fetch('/create-payment', {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
-          'Legacy-workflows' : false
+          //'Legacy-workflows' : true
 
         },
         body: JSON.stringify({
@@ -244,7 +255,7 @@ async function onLoaded() {
         }),
       }).then(response => response.json())
       console.log(paymentMethodTokenData.token);
-      console.log("On Tokenise Success Response:", response);
+      console.log("Create Payment response:", response);
       // Call `handler.handleFailure` to cancel the flow and display an error message
       if (!response) {
         return handler.handleFailure('The payment failed. Please try with another payment method.')
@@ -283,16 +294,16 @@ async function onLoaded() {
       //  const response = await resumePayment(resumeTokenData.resumeToken)
       console.log("On Resume SUCCESS:");
       console.log(resumeTokenData);
-      const response = await fetch('/resume', {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json',
-          'Legacy-workflows' : false
+      // const response = await fetch('/resume', {
+      //   method: 'post',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'Legacy-workflows' : false
 
-        },
-        body: JSON.stringify({ 'resumeToken': resumeTokenData.resumeToken })
+      //   },
+      //   body: JSON.stringify({ 'resumeToken': resumeTokenData.resumeToken })
 
-      }).then(response => response.json())
+      // }).then(response => response.json())
       console.log("On Resume Response:", response);
 
 

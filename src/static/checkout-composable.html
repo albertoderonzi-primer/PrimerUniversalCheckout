@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/checkout-style.css" />
+  <title>The LEGO STORE [Composable Checkout]</title>
+</head>
+
+<body>
+  <div class="title-bar">
+    <div class="title-bar-text">Primer Composable Checkout</div>
+  </div>
+  <div class="window">
+    <div class="title-bar">
+      <div class="title-bar-text">Lego Saturn V</div>
+    </div>
+    <img src="/static/lego.jpg" alt="Saturn V Lego Rocket">
+    <div class="window-body">
+    
+      <div id="order-container">
+        <div id="shirt-purchase-form">
+          <p class="heading">Take it home for 100£</p>
+          <input type="number" name="quantity" id="quantity" placeholder=" Quantity" min="1" class="inputs" />
+          <input type="number" name="amount" id="amount" placeholder=" Amount" min="1" class="inputs" />
+          <input type="text" name="currency" id="currency" placeholder=" Currency" class="inputs" />
+
+          <select name="size" id="size" class="inputs">
+            <option value="s">Small</option>
+            <option value="m" selected>Medium</option>
+            <option value="l">Large</option>
+            <option value="xl">Extra-Large</option>
+          </select>
+          <p class="heading">Billing Info</p>
+          <input type="text" placeholder="First Name" class="inputs" id="first-name" />
+          <input type="text" placeholder="Last Name" class="inputs" id="last-name" />
+          <input type="text" placeholder="Email Address" class="inputs" id="email-address" />
+          <input type="text" placeholder="Phone Number" class="inputs" id="mobile-number" />
+          <input type="text" placeholder="Address Line 1" class="inputs" id="address-line1" />
+          <input type="text" placeholder="Address Line 2" class="inputs" id="address-line2" />
+          <input type="text" placeholder="City" class="inputs" id="city" />
+          <input type="text" placeholder="State" class="inputs" id="state" />
+          <input type="text" placeholder="Postal Code" class="inputs" id="postal-code" />
+          <input type="text" placeholder="Country" class="inputs" id="country" />
+          <br />
+          <button class="btn inputs" id="autofill-button">Autofill</button>
+          <button class="btn inputs" id="submit-button">Submit</button>
+        </div>
+      </div>
+      <div id="checkout-container">
+        <primer-checkout>
+          <primer-main>
+            <primer-payment-methods></primer-payment-methods>
+            <primer-error-message-container></primer-error-message-container>
+          </primer-main>
+        </primer-checkout>
+      </div>
+
+
+    </div>
+  </div>
+  <script type="module" src="/static/client-composable.js"></script>
+</body>
+<!-- Include your script to initialize the SDK
+ 
+and send data to Primer -->
+<!-- You can choose between: -->
+
+<!-- /static/client-headless.js for headless flow-->
+<!-- /static/client-headless-manual.js for headless manual flow-->
+<!-- /static/client-headless_vaultmanager.js for headless vault manager TBC-->
+
+<!-- /static/client.js for drop-in standard flow-->
+<!-- /static/client-manual.js for legacy/manual flow -->
+</html>
+

@@ -5,13 +5,9 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="stylesheet" href="/static/checkout-style.css" />
-  <link rel="stylesheet" href="https://sdk.primer.io/web/v2.32.5/Checkout.css" />
-  <script src="https://sdk.primer.io/web/v2.32.5/Primer.min.js" crossorigin="anonymous"></script>
-
-  <!-- <link rel="stylesheet" href="https://sdk.primer.io/web/v2-latest/Checkout.css" />
-  <script src="https://sdk.primer.io/web/v2-latest/Primer.min.js" crossorigin="anonymous"></script> -->
-
+  <link rel="stylesheet" href="/static/checkout-style.css" />
+    <link rel="stylesheet" href="https://sdk.primer.io/web/v2.54.0/Checkout.css" />
+  <script src="https://sdk.primer.io/web/v2.54.0/Primer.min.js" crossorigin="anonymous"></script>
   <title>The LEGO STORE [WEB-HUC]</title>
 </head>
 
@@ -53,32 +49,33 @@
           <br />
           <button class="btn inputs" id="autofill-button">Autofill</button>
           <button class="btn inputs" id="submit-button">Submit</button>
-
-
-
         </div>
       </div>
       <div id="checkout-container">
-          <!-- <p class="heading">Checkout</p> -->
-          <!-- <input type="text" placeholder="Card Number" class="inputs" id="checkout-card-number-input" />
-          <input type="text" placeholder="Expiry" class="inputs" id="checkout-card-expiry-input" />
-          <input type="text" placeholder="Cvv" class="inputs" id="checkout-card-cvv-input" />
-          <input type="text" placeholder="Name" class="inputs" id="checkout-card-holder-input" /> -->
-          <!-- <button class="btn inputs" id="submit-button">Submit</button> -->
+        <primer-checkout>
+          <primer-main>
+            <primer-payment-methods></primer-payment-methods>
+            <primer-error-message-container></primer-error-message-container>
+          </primer-main>
+        </primer-checkout>
       </div>
 
 
     </div>
   </div>
 </body>
-<!-- Include your script to initialize the SDK and send data to Primer -->
+<!-- Include your script to initialize the SDK
+ 
+and send data to Primer -->
 <!-- You can choose between: -->
 
 <!-- /static/client-headless.js for headless flow-->
 <!-- /static/client-headless-manual.js for headless manual flow-->
+<!-- /static/client-headless_vaultmanager.js for headless vault manager TBC-->
 
 <!-- /static/client.js for drop-in standard flow-->
 <!-- /static/client-manual.js for legacy/manual flow -->
-<script src="/static/client-headless_vaultmanager.js"></script>
+ <script src="/static/client.js"></script>
 
 </html>
+
